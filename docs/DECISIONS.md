@@ -1,0 +1,314 @@
+# Architecture Decision Log
+
+Each decision records context, the choice, and consequences. Status values: **Accepted**, **Proposed** (needs owner
+confirmation before the milestone that depends on it), **Superseded**.
+
+Plain-language summaries are given for the product owner.
+
+---
+
+## ADR-001 — Monorepo with a Laravel API and a Next.js website
+**Status:** Accepted · 2026-10-14
+
+**Context.** The repository is empty (greenfield). The brief specifies Laravel + Next.js.
+
+**Decision.** One Git repository:
+
+```
+/apps/api     Laravel application (API, admin panel, queues, scheduler)
+/apps/web     Next.js (TypeScript, App Router) public site, member/learner dashboards
+/packages     (optional, later) shared TypeScript types generated from the API schema
+/docs         Documentation
+/infra        Deployment templates (Nginx, Supervisor, systemd, CI)
+/scripts      Safe setup/test/maintenance scripts
+```
+
+**Consequences.** One place for code, docs and CI; two runtimes (PHP and Node) must be hosted.
+
+> *Plain language:* the website people see and the "engine" behind it live in one project folder, in two clearly separated parts.
+
+---
+
+## ADR-002 — Modular monolith with domain modules
+**Status:** Accepted
+
+**Decision.** Laravel code is organised by domain under `app/Domain/<Module>` (Identity, Cms, Media, Publishing,
+Commerce, Payments, Learning, Events, Challenges, Booking, Community, Rewards, Captcha, Notifications,
+Announcements, Analytics, Integrations, Audit, Settings). Each module owns its models, services, actions, events,
+policies and adapters. Cross-module communication goes through service interfaces and domain events, not by reaching
+into another module's tables. No microservices.
+
+**Consequences.** New modules can be added without redesign; modules could be extracted later if ever needed.
+
+---
+
+## ADR-003 — Same-origin API via Next.js rewrites + Laravel session cookies
+**Status:** Accepted · amended 2026-10-14 during Milestone 1 (Sanctum removed)
+
+**Context.** Browser auth must be secure (no tokens in localStorage), CSRF-protected and simple to host.
+
+**Decision.**
+- Browsers talk only to `www.<domain>`. Next.js rewrites `/api/*`, `/admin`, and the admin panel's assets
+  (`/css|js|fonts/filament/*`, `/filament/*`, `/livewire-<hash>/*`) to the Laravel app (internal URL).
+  Cookies are therefore first-party, `HttpOnly`, `Secure` (in HTTPS environments), `SameSite=Lax`.
+- `/api/v1` routes are registered with Laravel's standard `web` middleware group (session + CSRF), the same group
+  Fortify uses. CSRF uses the `XSRF-TOKEN` cookie + `X-XSRF-TOKEN` header; `GET /api/v1/csrf-cookie` primes it.
+- **Amendment:** Sanctum was installed initially and then removed. With every browser request same-origin, the
+  plain session guard is sufficient, and running Sanctum's stateful middleware alongside Fortify's `web` group
+  would have meant two session/CSRF code paths. Sanctum can be re-added if third-party API tokens are ever needed.
+- `APP_URL` is the **public** origin (e.g. `http://localhost:3100`), so signed links in emails and generated
+  asset URLs match what the browser sees. Laravel trusts `X-Forwarded-*` only from `TRUSTED_PROXIES`.
+- Next.js server components call the Laravel API server-to-server for public, cacheable content.
+- Laravel Fortify (headless) provides registration, verification, password reset and TOTP 2FA endpoints.
+- Webhooks (payments, Calendly) hit Laravel directly at `api.<domain>/webhooks/...` or via the same proxy path —
+  documented per environment.
+
+**Consequences.** Minimal CORS surface; requires the proxy to forward client IP headers (trusted proxies configured).
+
+---
+
+## ADR-004 — Role/permission model with spatie/laravel-permission
+**Status:** Accepted
+
+**Decision.** Use `spatie/laravel-permission` (roles, permissions, multiple roles per user). Laravel Policies wrap
+every resource; controllers never check role names directly. A Super Administrator role is guarded so it cannot be
+removed from the last holder.
+
+---
+
+## ADR-005 — Money stored as integer minor units + ISO currency
+**Status:** Accepted
+
+**Context.** The brief asks for "appropriate monetary decimal types". Paystack and Flutterwave exchange amounts in
+minor units (kobo/cents) or decimals depending on endpoint.
+
+**Decision.** All cash amounts are `BIGINT UNSIGNED` minor units (e.g. ₦12,500.00 → `1250000`) plus a `CHAR(3)`
+currency column. Exchange/conversion rates use `DECIMAL(18,8)`. A `Money` value object (brick/money) performs all
+arithmetic; floats are never used. Provider adapters convert at the boundary and verify the exact amount.
+
+**Consequences.** Exact arithmetic, no rounding drift, matches provider APIs. This satisfies the "exact monetary
+type" intent; it deviates from literally using `DECIMAL` for amounts, deliberately.
+
+---
+
+## ADR-006 — Reward coins are a separate, append-only ledger; leaderboard points are separate from coins
+**Status:** Accepted
+
+**Decision.**
+- `reward_ledger_entries` is insert-only (DB user lacks UPDATE/DELETE on it in production; model guards in code).
+  Corrections are compensating entries referencing the original.
+- `reward_accounts.balance` is a cached projection updated in the **same transaction** as the ledger insert, under
+  `SELECT ... FOR UPDATE`. A nightly job re-derives balances from the ledger and alerts on drift.
+- Every credit has a unique `idempotency_key` (e.g. `course_completed:{user}:{course}`), enforced by a unique index.
+- **Leaderboard points** are recorded in a separate `engagement_point_entries` table. Spending coins must not drop a
+  member's ranking, and ranking rules may weight activities differently from coin rewards.
+
+> *Plain language:* coins are like store credit with a bank-statement-style history that can never be edited, only
+> corrected with a new line. Leaderboard score is a separate tally so spending coins doesn't cost anyone their rank.
+
+---
+
+## ADR-007 — Block content as versioned, validated JSON
+**Status:** Accepted
+
+**Decision.** Page content is an ordered list of blocks `{id, type, version, props, visibility}` stored per page
+revision. Each block type has a schema (PHP validator on save; Zod schema on the frontend). The frontend renders via
+a block registry (`type → React component`). Unknown or invalid blocks are skipped with a logged warning, never
+rendered raw. Block schemas carry a `version`; migrations upgrade old block data.
+
+---
+
+## ADR-008 — Administration UI: Filament panel in Laravel
+**Status:** Accepted · 2026-10-14 (owner accepted defaults)
+
+**Context.** The admin must manage ~80 entity types. Building every admin screen by hand in Next.js would roughly
+double front-end effort and delay revenue features.
+
+**Decision (recommended).** Use **Filament** (Laravel admin framework) at `/admin` for back-office management
+(CRUD, tables, filters, reports, settings, moderation queues, ledger views). Theme it with the same design tokens
+(dark). The CMS page builder uses Filament's Builder field with block forms mirroring ADR-007 schemas; "Preview"
+opens the real Next.js page in preview mode via a signed, short-lived preview token.
+
+Public site, member, learner, checkout and community experiences remain in Next.js.
+
+**Alternative.** Custom Next.js admin — maximal visual consistency, considerably more build and test time.
+
+**Consequences.** Faster, well-tested admin served by the Laravel app.
+
+**Implementation note (Milestone 1).** The panel has **no login page of its own**. Staff sign in on the website
+(Fortify, with TOTP 2FA) and the same session cookie authorises `/admin`, because both live on one origin.
+Signed-out visitors are redirected to `/login?next=/admin`; staff without confirmed 2FA are redirected to
+`/account/security?setup=two-factor&next=/admin` (`RequireStaffTwoFactor`). This avoids two separate 2FA
+enrolments (Filament's built-in MFA stores recovery codes differently from Fortify's). Verified end-to-end through
+the proxy on 2026-10-14.
+
+---
+
+## ADR-009 — Queues, cache and rate limiting
+**Status:** Accepted
+
+**Decision.** Production: Redis for queues (Laravel Horizon optional), cache, locks and rate limiting.
+Local development on this machine: `database` queue and cache drivers (Redis is not installed locally).
+Code depends only on Laravel's queue/cache contracts, so drivers are configuration-only.
+
+**Sessions stay on the `database` driver in every environment** (not Redis), so members can list and revoke
+their sessions and suspension can delete them (`RevokeUserSessions`).
+
+---
+
+## ADR-010 — File storage
+**Status:** Accepted
+
+**Decision.** Two logical disks: `public` (optimised public images) and `private` (paid files, submissions,
+receipts). Local: filesystem under `storage/app`. Production: S3-compatible object storage (e.g. Cloudflare R2,
+Backblaze B2, AWS S3) with **private bucket** for protected files. Downloads are issued as short-lived signed URLs
+only after an entitlement check, and each issuance is logged.
+
+---
+
+## ADR-011 — Video streaming provider via adapter
+**Status:** Accepted default (Q5) · 2026-10-14 — revisit when an account is opened
+
+**Decision.** `VideoProvider` interface (upload/ingest, status, signed playback URL, delete). First adapter:
+**Bunny Stream** (token-authenticated playback, low cost) — alternatives Mux or Cloudflare Stream behind the same
+interface. Paid lessons never expose a permanent file URL. Screen-recording cannot be fully prevented; this is
+documented to the owner.
+
+---
+
+## ADR-012 — Payment provider adapters: Paystack and Flutterwave
+**Status:** Accepted
+
+**Decision.** `PaymentGateway` interface: `initialize(order)`, `verify(reference)`, `parseWebhook(request)`
+(signature check: Paystack `x-paystack-signature` HMAC-SHA512 of raw body with secret key; Flutterwave
+`verif-hash` / signature header per current docs — verified against official docs at implementation time),
+`refund(payment, amount)`. All webhook payloads are stored in `webhook_events` with a unique
+`(provider, provider_event_id)` constraint before processing (idempotent). Fulfilment only follows a server-side
+verify call that confirms status, amount and currency.
+
+Live verification stays **pending** until real credentials and a production test transaction are supplied.
+
+---
+
+## ADR-013 — First-party CAPTCHA: signed proof-of-work challenge
+**Status:** Accepted
+
+**Context.** Must be accessible, not trivial arithmetic, server-validated, single-use.
+
+**Decision.** Server issues a challenge `{id, salt, difficulty, expires_at}` signed with HMAC; the browser solves a
+SHA-256 proof-of-work in a Web Worker (invisible to the user, ~0.5–2 s on mobile; difficulty adaptive to risk).
+Server verifies signature, expiry, solution, and marks the challenge id consumed (unique row / atomic cache `add`)
+to prevent replay. Bound to form purpose and session. Combined with honeypot field, minimum-time-to-submit and
+per-IP/per-account rate limits. No image puzzles → no visual-accessibility barrier. reCAPTCHA and Turnstile are
+alternative drivers behind `CaptchaVerifier`.
+
+**Limitation.** Proof-of-work raises the cost of automated abuse; it does not stop a determined, well-resourced
+attacker. Rate limits and moderation remain essential.
+
+---
+
+## ADR-014 — Database engine and local parity
+**Status:** Accepted
+
+**Context.** This machine runs XAMPP **MariaDB 10.4.32** (end-of-life since June 2024). Production target is
+**MySQL 8.4 LTS** (or 8.0+ if the host only offers that).
+
+**Decision.** Write migrations to the common subset of MySQL 8 and MariaDB 10.4 for now (no MySQL-only functional
+indexes or `SKIP LOCKED` dependence). CI runs the test suite against **MySQL 8.4** to guarantee production parity.
+Recommend upgrading local DB to MySQL 8.4 (or MariaDB 10.11 LTS) during Milestone 1. Dedicated databases:
+`ifeanyiosiaku` and `ifeanyiosiaku_testing` — no other existing databases on this server are touched.
+
+---
+
+## ADR-015 — Identifiers
+**Status:** Accepted
+
+**Decision.** Internal `BIGINT` auto-increment primary keys; resources exposed in URLs or APIs where enumeration
+would leak information (orders, payments, bookings, tickets, certificates, submissions, downloads) also carry a
+`ulid` public identifier. Authorisation is still enforced on every access — the ULID is defence in depth, not access control.
+
+---
+
+## ADR-016 — Time handling
+**Status:** Accepted
+
+**Decision.** DB and server in UTC. Users and events store an IANA time zone. Default site time zone
+`Africa/Lagos`. Booking slots are computed in the host's availability time zone and displayed in the viewer's.
+
+---
+
+## ADR-017 — Testing and quality tooling
+**Status:** Accepted
+
+**Decision.** Backend: Pest (PHPUnit), Larastan (PHPStan) level 8 target, Laravel Pint, `composer audit`.
+Frontend: Vitest + Testing Library, ESLint, Prettier, TypeScript strict, `npm audit`, axe accessibility checks.
+End-to-end: Playwright (Journeys A–F), payment journeys against provider sandboxes or recorded fakes clearly labelled as such.
+CI: GitHub Actions (MySQL 8.4 + Redis services). Builds fail on test, type or lint errors.
+
+---
+
+## ADR-018 — Hosting target
+**Status:** Accepted · 2026-10-14 — provider is **Hostinger**; plan tier to be confirmed (VPS KVM 2 recommended). See DEPLOYMENT_PLAN.md §2.1
+
+**Recommendation.** A Linux VPS (≥ 2 vCPU / 4 GB RAM) running Nginx, PHP-FPM 8.3+, Node 22/24 LTS, MySQL 8.4,
+Redis, Supervisor (queue workers) and cron (scheduler); object storage and video provider external.
+Typical shared/cPanel hosting cannot reliably run the Next.js server, queue workers and Redis and is **not**
+recommended. Alternative: Next.js on Vercel + Laravel on a managed VPS (Forge/Ploi/Laravel Cloud).
+
+---
+
+## ADR-019 — Frontend stack details
+**Status:** Accepted
+
+**Decision.** Next.js (current stable; 16.x at time of writing) with App Router, React Server Components, TypeScript
+strict, Tailwind CSS v4 with design tokens as CSS variables, Radix UI primitives (accessible) wrapped in our own
+components, Motion (Framer Motion) for animation gated by `prefers-reduced-motion`, Shiki for server-side syntax
+highlighting, react-markdown + rehype-sanitize for Markdown, TanStack Query for client-side data, Zod for schemas.
+
+---
+
+## ADR-020 — Framework and package versions
+**Status:** Accepted · pinned 2026-10-14
+
+**Decision.** Pinned via `composer.lock` / `package-lock.json`:
+
+| Package | Version |
+|---|---|
+| laravel/framework | 13.36.0 (requires PHP ≥ 8.3) |
+| laravel/fortify | 1.41.0 |
+| filament/filament | 5.10.2 (Livewire 4) |
+| spatie/laravel-permission | 8.3.0 |
+| brick/money | 0.15.2 |
+| pestphp/pest · larastan/larastan | 4.x · 3.x |
+| next · react | 16.4.0 · 19.3.0 |
+| tailwindcss · zod · motion | 4.x · 4.6.7 · 14.2.0 |
+| vitest | 5.0.4 |
+
+Local PHP is 8.3.33; production must be PHP ≥ 8.3 and Node ≥ 22.12.
+
+---
+
+## ADR-021 — `User` model location
+**Status:** Accepted · 2026-10-14
+
+**Decision.** `User` stays at `App\Models\User` (Laravel, Fortify, Filament and spatie/permission reference it by
+convention). Every other model lives in its domain module (`App\Domain\<Module>\Models`). HTTP controllers and
+middleware specific to a module live in `App\Domain\<Module>\Http`; cross-cutting middleware in `App\Http`.
+
+---
+
+## ADR-022 — Local ports
+**Status:** Accepted · 2026-10-14
+
+**Decision.** API `127.0.0.1:8110`, website `localhost:3100`. Ports 8000, 8090–8092 and 8100 are used by other
+projects on the development machine.
+
+---
+
+## ADR-023 — Account enumeration resistance
+**Status:** Accepted · 2026-10-14
+
+**Decision.** Login failures return the same message for unknown emails and wrong passwords; the suspended-account
+message is only shown after a correct password. "Forgot password" always returns the same success message
+(`GenericPasswordResetLinkResponse`), overriding Fortify's default, which reveals unknown emails. Registration
+still reports a duplicate email (a deliberate usability trade-off, protected by CAPTCHA and rate limits).

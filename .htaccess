@@ -1,0 +1,3 @@
+# Safeguard: this project is NOT served by XAMPP Apache. Deny all web access
+# so .env files, storage and source cannot be exposed via http://localhost/ifeanyiosiaku/
+Require all denied

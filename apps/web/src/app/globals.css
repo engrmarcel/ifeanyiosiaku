@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens (SYSTEM_ARCHITECTURE §10). These CSS variables are the single source of truth;
+ * Tailwind utilities read them through @theme. Administrator overrides (Milestone 2) are emitted
+ * as the same variables on <html>, so components never hard-code colours.
+ */
+:root {
+  --io-bg: #080a0d;          /* Obsidian background */
+  --io-surface: #11161d;     /* Graphite surfaces */
+  --io-surface-raised: #161c25;
+  --io-border: #232a33;      /* Subtle neutral border */
+  --io-border-strong: #313a46;
+  --io-accent: #a3f7bf;      /* Signature code green */
+  --io-accent-strong: #7fe9a3;
+  --io-accent-ink: #062012;  /* Text on green surfaces */
+  --io-violet: #7c5cfc;      /* Electric violet (decorative; use --io-violet-text for text) */
+  --io-violet-text: #a593ff;
+  --io-amber: #f59e0b;       /* Amber accent */
+  --io-text: #f5f7fa;        /* Primary text */
+  --io-text-muted: #aab4c0;  /* Secondary text */
+  --io-danger: #ff8a8a;
+  --io-danger-surface: #2a1215;
+  --io-success-surface: #0e2418;
+  --io-warning-surface: #2a1e08;
+
+  --io-radius-sm: 6px;
+  --io-radius: 10px;
+  --io-radius-lg: 16px;
+
+  --io-glow-accent: 0 0 0 1px rgb(163 247 191 / 0.35), 0 0 24px -4px rgb(163 247 191 / 0.35);
+  --io-glow-violet: 0 0 0 1px rgb(124 92 252 / 0.4), 0 0 28px -6px rgb(124 92 252 / 0.45);
+
+  --io-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --io-duration-fast: 150ms;
+  --io-duration: 300ms;
+  --io-duration-slow: 700ms;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--io-bg);
+  --color-surface: var(--io-surface);
+  --color-surface-raised: var(--io-surface-raised);
+  --color-border: var(--io-border);
+  --color-border-strong: var(--io-border-strong);
+  --color-accent: var(--io-accent);
+  --color-accent-strong: var(--io-accent-strong);
+  --color-accent-ink: var(--io-accent-ink);
+  --color-violet: var(--io-violet);
+  --color-violet-text: var(--io-violet-text);
+  --color-amber: var(--io-amber);
+  --color-text: var(--io-text);
+  --color-muted: var(--io-text-muted);
+  --color-danger: var(--io-danger);
+  --color-danger-surface: var(--io-danger-surface);
+  --color-success-surface: var(--io-success-surface);
+  --color-warning-surface: var(--io-warning-surface);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius-sm: var(--io-radius-sm);
+  --radius-md: var(--io-radius);
+  --radius-lg: var(--io-radius-lg);
+
+  --shadow-glow: var(--io-glow-accent);
+  --shadow-glow-violet: var(--io-glow-violet);
+
+  --ease-out-expo: var(--io-ease-out);
+}
+
+html {
+  background: var(--io-bg);
+}
+
+body {
+  background: var(--io-bg);
+  color: var(--io-text);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(163 247 191 / 0.3);
+  color: var(--io-text);
+}
+
+/* Visible, consistent keyboard focus everywhere (WCAG 2.4.7). */
+:focus-visible {
+  outline: 2px solid var(--io-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Subtle technical grid used behind hero and auth layouts. Purely decorative. */
+.io-grid-backdrop {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+@keyframes io-caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.io-caret {
+  animation: io-caret-blink 1.1s steps(1) infinite;
+}
+
+/* Respect reduced-motion preferences: stop decorative animation, keep content fully readable. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
