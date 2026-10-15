@@ -32,7 +32,7 @@ jobs:
       DB_USERNAME: root
       DB_PASSWORD: root
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -55,7 +55,12 @@ jobs:
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
       - name: Tests (Pest)
-        run: vendor/bin/pest
+        run: vendor/bin/pest --log-junit storage/logs/junit.xml
+
+      # Job logs need a GitHub login; annotations are public, so failures stay readable to everyone.
+      - name: Publish test failures as annotations
+        if: failure()
+        run: php ../../scripts/ci-annotate-junit.php storage/logs/junit.xml
 
       - name: Dependency vulnerabilities
         run: composer audit --locked
@@ -67,9 +72,9 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "24"
           cache: npm

@@ -64,7 +64,7 @@ reporting, KPIs and operational health.
 **Acceptance:** documents exist, are mutually consistent, and are reviewed by the owner.
 
 ### Milestone 1 — Foundation
-Status as of 2026-10-15: **core complete and verified; 4 items partially done** (see notes).
+Status as of 2026-10-15: **core complete and verified; 3 items partially done** (see notes).
 
 1. [x] Git repository initialised (`main`), `.gitignore`, `.editorconfig`, `.gitattributes`, deny-all `.htaccess`, README, `.env.example` files; first commit pushed to GitHub (owner approved 2026-10-14)
 2. [x] Laravel 13.36 in `apps/api`; MySQL connection; `ifeanyiosiaku` + `ifeanyiosiaku_testing` databases
@@ -83,7 +83,7 @@ Status as of 2026-10-15: **core complete and verified; 4 items partially done** 
 15. [x] Website pages: register, login, verify email, forgot/reset password, 2FA challenge, account overview, account security (2FA setup, recovery codes, sessions, password change)
 16. [x] Health: `/up`, `/api/v1/health` (details for permitted staff only), website `/healthz`, scheduler heartbeat
 17. [~] Pest, Larastan (level 8), Pint, Vitest, Testing Library, axe; `scripts/setup.ps1`, `dev.ps1`, `test.ps1`. **Not done:** Playwright browser tests (Milestone 8; an HTTP-level end-to-end smoke test was run instead, see results)
-18. [~] GitHub Actions workflow written (MySQL 8.4, PHP 8.3, Node 24; style, static analysis, tests, build, audits). **Not yet run:** no GitHub remote exists
+18. [x] GitHub Actions CI (MySQL 8.4, PHP 8.3, Node 24; style, static analysis, tests, build, audits) — **green on GitHub** since commit a435d1c (2026-10-15). The first run failed because the then-empty `tests/Unit` folder is not stored by Git; resolved. Test failures are now published as public annotations.
 19. [x] docs/LOCAL_SETUP.md
 20. [x] Content protection (owner request 2026-10-15, ADR-024): image saving, right-click and Inspect shortcuts blocked on the website by default; admin switch; verified in Chrome both ways
 21. [x] Add-on switches for Commerce, Learning, Community, Rewards (owner request 2026-10-15, ADR-025): settings, admin toggles, `addon:` route guard, website `useAddon()`; staff 2FA requirement OFF in development / ON in production (ADR-026)
@@ -92,7 +92,7 @@ Status as of 2026-10-15: **core complete and verified; 4 items partially done** 
 - API: 111 Pest tests, 387 assertions, all passing on MariaDB 10.4; Larastan level 8: 0 errors; Pint: clean.
 - Website: 23 Vitest tests passing (incl. axe accessibility checks on form components); ESLint clean; `tsc` clean; production build succeeds.
 - End-to-end through the proxy (`localhost:3100` → Laravel `:8110`): 20/20 HTTP checks (health, CSRF, CAPTCHA-protected registration, sign-in/out, sessions, admin refusal/redirect, security and no-cache headers), plus staff sign-in with a real TOTP code and the admin dashboard, stylesheet and Livewire script loading through the proxy.
-- Not verified: CI on GitHub (never run), MySQL 8.4 (CI only), real email delivery (log mailer only), reCAPTCHA/Turnstile against live Google/Cloudflare (tested with HTTP fakes), visual review of pages in a browser.
+- Verified on GitHub CI (2026-10-15): full backend suite on MySQL 8.4 and the website build. Not verified: real email delivery (log mailer only), reCAPTCHA/Turnstile against live Google/Cloudflare (tested with HTTP fakes), visual review of pages in a browser.
 
 **Acceptance tests:** registration → verification email (log mailer) → verify → login → logout; password reset
 token single-use and expiring; throttling; suspended user cannot log in and existing sessions die; non-admin

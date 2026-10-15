@@ -13,7 +13,7 @@ Keep this file current so any session can continue without repeating work.
 
 ## Next actions
 
-1. Confirm the first push reached GitHub and check the CI run result.
+1. CI is green on GitHub; the repository is public. Check https://github.com/engrmarcel/ifeanyiosiaku/actions after each push (run list and annotations are readable without login via the GitHub API).
 2. Close the M1 leftovers that block M2: Toast + ErrorState components.
 3. Start Milestone 2 (media library → pages/revisions → block registry → homepage sections).
 
