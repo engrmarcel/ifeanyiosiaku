@@ -94,6 +94,15 @@ body {
   border-radius: 4px;
 }
 
+/* Content protection (ADR-024): no dragging, selecting or iOS long-press saving of media. */
+html.io-protect img,
+html.io-protect video,
+html.io-protect picture {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* Subtle technical grid used behind hero and auth layouts. Purely decorative. */
 .io-grid-backdrop {
   background-image:

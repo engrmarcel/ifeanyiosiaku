@@ -31,6 +31,10 @@ return [
         'captcha.driver' => env('CAPTCHA_DRIVER', 'first_party'),
 
         'registration.enabled' => true,
+
+        // OFF by default: the website discourages saving images, right-click and developer-tools shortcuts.
+        // This deters casual copying only; it cannot technically prevent it (see DECISIONS ADR-024).
+        'protection.allow_saving_and_inspect' => false,
     ],
 
     // Settings that may be exposed to the public website (never secrets).
@@ -40,6 +44,7 @@ return [
         'announcements.enabled',
         'captcha.driver',
         'registration.enabled',
+        'protection.allow_saving_and_inspect',
     ],
 
 ];

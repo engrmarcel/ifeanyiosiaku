@@ -312,3 +312,26 @@ projects on the development machine.
 message is only shown after a correct password. "Forgot password" always returns the same success message
 (`GenericPasswordResetLinkResponse`), overriding Fortify's default, which reveals unknown emails. Registration
 still reports a duplicate email (a deliberate usability trade-off, protected by CAPTCHA and rate limits).
+
+---
+
+## ADR-024 — Content protection (image saving and Inspect)
+**Status:** Accepted · 2026-10-15 (owner request)
+
+**Context.** The owner asked that visitors not be able to save or download pictures or open "Inspect", controlled
+from the admin panel and OFF by default.
+
+**Decision.** Admin setting **"Allow visitors to save images and use Inspect"** (`protection.allow_saving_and_inspect`,
+default `false`) on *System → Site settings*. While it is off, the public website:
+- blocks the right-click menu (except inside form fields, so paste and autofill still work);
+- blocks dragging images/videos out of the page and iOS long-press saving (`-webkit-touch-callout: none`);
+- blocks F12, Ctrl+Shift+I/J/C/K, Ctrl+U, Ctrl+S and the macOS equivalents (⌘⌥I/J/C/U, ⌘U, ⌘S).
+
+Protection is active while the setting loads and if it cannot be loaded (fail-safe). Signed-in staff are exempt so
+the owner can debug. The admin panel is not affected.
+
+**Limitation (explained to the owner).** This is a deterrent, not a security control. Browsers always keep their own
+menu route to developer tools, screenshots work, disabling JavaScript removes the handlers, and any image shown on
+screen has been downloaded by the browser. Copy and paste of text, keyboard navigation and screen readers are
+deliberately left working (accessibility). Paid files remain protected server-side (entitlements and signed URLs,
+Milestone 3).

@@ -3,6 +3,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ContentProtection } from "@/components/protection/ContentProtection";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import "./globals.css";
 
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <AuthProvider>
+          <ContentProtection />
           <SiteHeader />
           <main id="main" className="flex flex-1 flex-col">
             {children}
