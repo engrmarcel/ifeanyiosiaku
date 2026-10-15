@@ -11,6 +11,8 @@
 |
 */
 
+$requireStaffTwoFactor = env('REQUIRE_STAFF_TWO_FACTOR');
+
 return [
 
     'frontend_url' => rtrim((string) env('FRONTEND_URL', 'http://localhost:3100'), '/'),
@@ -26,7 +28,11 @@ return [
         // The announcement popup is OFF until an administrator switches it on (REQ-ANN-1).
         'announcements.enabled' => false,
 
-        'security.require_staff_two_factor' => true,
+        // Staff two-factor requirement (ADR-026): OFF during development, ON in production.
+        // REQUIRE_STAFF_TWO_FACTOR overrides the environment-based default when set.
+        'security.require_staff_two_factor' => $requireStaffTwoFactor === null || $requireStaffTwoFactor === ''
+            ? env('APP_ENV') === 'production'
+            : filter_var($requireStaffTwoFactor, FILTER_VALIDATE_BOOL),
 
         'captcha.driver' => env('CAPTCHA_DRIVER', 'first_party'),
 
@@ -35,6 +41,12 @@ return [
         // OFF by default: the website discourages saving images, right-click and developer-tools shortcuts.
         // This deters casual copying only; it cannot technically prevent it (see DECISIONS ADR-024).
         'protection.allow_saving_and_inspect' => false,
+
+        // Add-on modules (ADR-025). All ON by default; administrators can switch each one off.
+        'addons.commerce.enabled' => true,
+        'addons.learning.enabled' => true,
+        'addons.community.enabled' => true,
+        'addons.rewards.enabled' => true,
     ],
 
     // Settings that may be exposed to the public website (never secrets).
@@ -45,6 +57,10 @@ return [
         'captcha.driver',
         'registration.enabled',
         'protection.allow_saving_and_inspect',
+        'addons.commerce.enabled',
+        'addons.learning.enabled',
+        'addons.community.enabled',
+        'addons.rewards.enabled',
     ],
 
 ];

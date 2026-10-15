@@ -87,7 +87,7 @@ Rules:
 - REQ-AUTH-2 (P0) Login/logout; session-based, HttpOnly secure cookies; throttled.
 - REQ-AUTH-3 (P0) Password reset via single-use, expiring token.
 - REQ-AUTH-4 (P0) Session management: list active sessions, revoke others.
-- REQ-AUTH-5 (P1) Optional TOTP multi-factor authentication with recovery codes; **mandatory for staff roles** (default, configurable).
+- REQ-AUTH-5 (P1) Optional TOTP multi-factor authentication with recovery codes; **required for staff roles in production** (OFF by default in development, configurable; ADR-026).
 - REQ-AUTH-6 (P0) Account suspension and immediate revocation of sessions/staff access.
 - REQ-AUTH-7 (P0) Role-based access control with permissions; server-side policies on every protected operation.
 - REQ-AUTH-8 (P1) Account deletion request workflow (with financial-record retention, see privacy section).
@@ -118,7 +118,7 @@ Rules:
 **Acceptance:** an administrator creates a page, adds/reorders blocks, saves a draft, previews, publishes, and sees
 it on the public site with correct metadata — without touching source files (Journey F).
 
-### 4.3 Commerce (Milestone 3)
+### 4.3 Commerce (Milestone 3) — add-on (ADR-025)
 
 - REQ-COM-1 (P0) Product catalogue: eBook, PDF, research paper, publication, template, code package, digital asset,
   premium article, course enrolment, event ticket, appointment service, admin-defined types.
@@ -136,7 +136,7 @@ it on the public site with correct metadata — without touching source files (J
 
 **Acceptance:** Journey A passes end-to-end against provider sandbox.
 
-### 4.4 Learning management (Milestone 4)
+### 4.4 Learning management (Milestone 4) — add-on (ADR-025)
 
 - REQ-LMS-1 (P0) Courses with modules and lessons (video, text, code, resources, live link), landing pages,
   pricing via the commerce engine, free preview lessons.
@@ -174,7 +174,7 @@ it on the public site with correct metadata — without touching source files (J
 
 **Acceptance:** Journey C.
 
-### 4.7 Community & moderation (Milestone 6)
+### 4.7 Community & moderation (Milestone 6) — add-on (ADR-025)
 
 - REQ-COMM-1 (P1) Profiles, categories, posts/discussions, Q&A (accepted answers), comments/replies, reactions,
   bookmarks, follows, groups, course- and event-linked discussions, search, notifications.
@@ -182,7 +182,7 @@ it on the public site with correct metadata — without touching source files (J
   reporting, moderator queue, removal, suspension, blocking, audit log of moderation actions.
 - REQ-COMM-3 (P1) Visibility: public visitors see only public content; participation depends on account status.
 
-### 4.8 Rewards, achievements, leaderboard (Milestone 6)
+### 4.8 Rewards, achievements, leaderboard (Milestone 6) — add-on (ADR-025)
 
 - REQ-RWD-1 (P1) "Osiaku Coins" (label editable): closed-loop promotional credit, non-transferable, non-withdrawable.
   Model changes (transfers, cash-out) are explicitly out of scope and would need legal review.
@@ -215,6 +215,8 @@ it on the public site with correct metadata — without touching source files (J
 - REQ-NOT-1 (P0) Queued transactional email with templates, retries, delivery logs: verification, password reset,
   order/payment confirmation, enrolment, booking, event reminders, reward transactions, moderation notices.
 - REQ-NOT-2 (P1) Per-user notification preferences (transactional/security email cannot be disabled).
+
+- REQ-ADDON-1 (P0) Commerce, Learning, Community and Rewards can each be switched on/off by an administrator (default ON). A disabled module is hidden from the website and admin, its endpoints return 404, and its data is retained.
 
 ### 4.11 Administration & analytics (Milestone 7, built incrementally from Milestone 1)
 
@@ -251,7 +253,7 @@ it on the public site with correct metadata — without touching source files (J
 |---|---|---|
 | Q1 | Public name form ("Ifeanyi Osiaku" vs "Ifeanyi Marcel Osiaku") | "Ifeanyi Osiaku" |
 | Q2 | Provide a clean high-resolution portrait (and optional secondary photos) | **Answered 2026-10-14:** portrait supplied (`apps/web/public/brand/ifeanyi-osiaku-portrait.jpg`, 1054×1492) |
-| Q3 | Hosting provider/plan (see DEPLOYMENT_PLAN.md) | **Answered 2026-10-14:** Hostinger. Plan tier still to confirm (VPS KVM 2 recommended) |
+| Q3 | Hosting provider/plan (see DEPLOYMENT_PLAN.md) | **Answered 2026-10-15:** Hostinger VPS, KVM 2 or larger |
 | Q4 | Primary currency and whether to sell in USD as well | NGN primary; USD enabled later |
 | Q5 | Video provider preference / budget | Bunny Stream (adapter interface allows switching) |
 | Q6 | Transactional email provider | Provider-agnostic SMTP/API (e.g. Postmark, Resend, Amazon SES, Brevo) |

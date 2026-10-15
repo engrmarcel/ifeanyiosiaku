@@ -1,6 +1,6 @@
 # Deployment Plan
 
-Status: **planning only**. No hosting provider, plan, domain ownership or DNS access has been confirmed (Q3).
+Status: **planning only**. Hosting decided 2026-10-15: **Hostinger VPS (KVM 2 or larger)**. Domain ownership and DNS access are not yet confirmed.
 Nothing has been deployed. The detailed, step-by-step runbook (`docs/PRODUCTION_DEPLOYMENT.md`) is written in
 Milestone 9 for the confirmed host.
 
@@ -32,7 +32,7 @@ Milestone 9 for the confirmed host.
 ### 2.1 Hostinger (owner's chosen provider, 2026-10-14)
 
 Researched 2026-10-14 from Hostinger's published pages and independent benchmarks; plan details and prices change
-often and must be re-checked on hostinger.com before purchase. **Which Hostinger plan the owner holds is not yet known.**
+often and must be re-checked on hostinger.com before purchase. **Owner decision (2026-10-15): VPS, KVM 2 or larger.**
 
 | Requirement (§1) | Shared "Premium" | Shared "Business" / Cloud (Startup+) | VPS (KVM 2 or larger) |
 |---|---|---|---|
@@ -86,6 +86,7 @@ apex ifeanyiosiaku.online → 301 → www
 - [ ] Video provider configured with token authentication
 - [ ] Private bucket verified as not publicly listable/readable
 - [ ] `APP_ENV=production`, `APP_DEBUG=false`, secure cookies, trusted proxies, CSP enforced
+- [ ] Staff two-factor requirement is ON (default in production, ADR-026): a staff account without 2FA is redirected away from `/admin`
 - [ ] Queue workers and scheduler running and monitored (heartbeat)
 - [ ] Encrypted daily backups + a **tested restore**
 - [ ] Error monitoring receiving events

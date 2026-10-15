@@ -86,6 +86,7 @@ Status as of 2026-10-15: **core complete and verified; 4 items partially done** 
 18. [~] GitHub Actions workflow written (MySQL 8.4, PHP 8.3, Node 24; style, static analysis, tests, build, audits). **Not yet run:** no GitHub remote exists
 19. [x] docs/LOCAL_SETUP.md
 20. [x] Content protection (owner request 2026-10-15, ADR-024): image saving, right-click and Inspect shortcuts blocked on the website by default; admin switch; verified in Chrome both ways
+21. [x] Add-on switches for Commerce, Learning, Community, Rewards (owner request 2026-10-15, ADR-025): settings, admin toggles, `addon:` route guard, website `useAddon()`; staff 2FA requirement OFF in development / ON in production (ADR-026)
 
 **Verified results (2026-10-14, this machine):**
 - API: 111 Pest tests, 387 assertions, all passing on MariaDB 10.4; Larastan level 8: 0 errors; Pint: clean.
@@ -118,6 +119,7 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 switch even when scheduled; Lighthouse/axe report recorded (measured, not assumed).
 
 ### Milestone 3 — Commerce
+- [ ] Gate every route, page and admin screen behind the `commerce` add-on (ADR-025)
 - [ ] Products, prices, files, versions, categories/tags, bundles, licences, search/filter, related
 - [ ] Cart (guest + user, merge on login), checkout with server-side pricing, coupons
 - [ ] Orders + state machine + audit; order expiry job
@@ -135,6 +137,7 @@ then, against FakeGateway and recorded webhook fixtures, reported as such. Tests
 signature, amount mismatch, concurrent confirmations, unentitled download denied, expired URL denied.
 
 ### Milestone 4 — Learning
+- [ ] Gate behind the `learning` add-on; free courses keep working when `commerce` is off (ADR-025)
 - [ ] Courses, modules, lessons, resources, previews, drip, cohorts, bundles (via commerce)
 - [ ] VideoProvider contract + Bunny Stream adapter + local dev adapter; signed playback
 - [ ] Enrolment on purchase or free enrol; learner dashboard; lesson player; resume; progress
@@ -157,6 +160,7 @@ leaked before submission.
 **Acceptance:** Journeys C and E; concurrency test for last ticket and same booking slot.
 
 ### Milestone 6 — Community and rewards
+- [ ] Gate behind the `community` and `rewards` add-ons; coin redemption also requires `commerce` (ADR-025)
 - [ ] Community categories, posts, Q&A, comments, reactions, bookmarks, follows, groups, course/event discussions, search
 - [ ] Moderation: reports, queue, actions, restrictions, blocks, rate limits, duplicate checks, new-member limits
 - [ ] Reward accounts + append-only ledger + policies + rule engine + idempotency

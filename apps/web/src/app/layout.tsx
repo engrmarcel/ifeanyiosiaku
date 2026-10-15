@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ContentProtection } from "@/components/protection/ContentProtection";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsProvider";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3100";
@@ -40,14 +41,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <AuthProvider>
-          <ContentProtection />
-          <SiteHeader />
-          <main id="main" className="flex flex-1 flex-col">
-            {children}
-          </main>
-          <SiteFooter />
-        </AuthProvider>
+        <SiteSettingsProvider>
+          <AuthProvider>
+            <ContentProtection />
+            <SiteHeader />
+            <main id="main" className="flex flex-1 flex-col">
+              {children}
+            </main>
+            <SiteFooter />
+          </AuthProvider>
+        </SiteSettingsProvider>
       </body>
     </html>
   );

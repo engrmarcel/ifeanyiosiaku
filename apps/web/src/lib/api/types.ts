@@ -6,6 +6,8 @@ export type CurrentUser = {
   timezone: string;
   two_factor_enabled: boolean;
   is_staff: boolean;
+  /** Staff account that must enrol in 2FA before the admin panel opens. */
+  two_factor_required: boolean;
   can_access_admin: boolean;
   roles: string[];
   profile: {

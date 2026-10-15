@@ -248,7 +248,7 @@ CI: GitHub Actions (MySQL 8.4 + Redis services). Builds fail on test, type or li
 ---
 
 ## ADR-018 — Hosting target
-**Status:** Accepted · 2026-10-14 — provider is **Hostinger**; plan tier to be confirmed (VPS KVM 2 recommended). See DEPLOYMENT_PLAN.md §2.1
+**Status:** Accepted · 2026-10-15 — **Hostinger VPS, KVM 2 or larger** (owner decision). See DEPLOYMENT_PLAN.md §2.1
 
 **Recommendation.** A Linux VPS (≥ 2 vCPU / 4 GB RAM) running Nginx, PHP-FPM 8.3+, Node 22/24 LTS, MySQL 8.4,
 Redis, Supervisor (queue workers) and cron (scheduler); object storage and video provider external.
@@ -335,3 +335,36 @@ menu route to developer tools, screenshots work, disabling JavaScript removes th
 screen has been downloaded by the browser. Copy and paste of text, keyboard navigation and screen readers are
 deliberately left working (accessibility). Paid files remain protected server-side (entitlements and signed URLs,
 Milestone 3).
+
+---
+
+## ADR-025 — Optional modules as switchable add-ons
+**Status:** Accepted · 2026-10-15 (owner request)
+
+**Decision.** Commerce, Learning, Community and Rewards are **add-ons**, each with an admin switch on
+*System → Site settings* (`addons.<name>.enabled`, all **ON** by default, changes audited). The core platform
+(portfolio/CMS, accounts, events, appointments, administration) is always on.
+
+Every module built from Milestone 3 onward must:
+- put its API routes behind `->middleware('addon:<name>')` — a disabled module answers **404** (`addon_disabled`), as if it did not exist;
+- hide its website pages and navigation with `useAddon('<name>')` (and a server-side check on its pages);
+- hide its admin screens when switched off;
+- keep its data when switched off, so switching back on restores everything.
+
+**Cross-module rules** (enforced as the modules are built): paid courses, paid tickets and paid bookings need
+Commerce; spending Osiaku Coins at checkout needs both Rewards and Commerce. When a dependency is off, the
+dependent feature degrades (e.g. free courses only) instead of failing.
+
+---
+
+## ADR-026 — Staff two-factor requirement defaults by environment
+**Status:** Accepted · 2026-10-15 (owner request). Supersedes the "mandatory by default" wording in REQ-AUTH-5.
+
+**Decision.** `security.require_staff_two_factor` defaults to **OFF** when `APP_ENV` is local, testing or staging,
+and **ON** when `APP_ENV=production`. `REQUIRE_STAFF_TWO_FACTOR=true|false` in the server environment overrides
+the default, and a Super Administrator can still change it in Site settings. Two-factor remains available to
+every member at all times. The automated tests run with the requirement **on**, so the production behaviour stays
+tested.
+
+**Consequence.** Production deployment must set `APP_ENV=production` (already a launch gate); the deployment
+checklist verifies that `/admin` demands two-factor for staff.

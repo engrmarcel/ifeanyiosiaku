@@ -7,15 +7,15 @@ Keep this file current so any session can continue without repeating work.
 - **Milestone 0:** complete. Owner accepted all defaults (Filament admin, VPS hosting target, "Ifeanyi Osiaku").
 - **Milestone 1:** core complete and verified (see IMPLEMENTATION_ROADMAP.md §3 for the checklist and test
   results). Partially done: notification templates table (→ M7), Toast/ErrorState
-  components (→ M2), Playwright (→ M8). Content protection added (ADR-024).
+  components (→ M2), Playwright (→ M8). Added: content protection (ADR-024), add-on switches (ADR-025),
+  staff 2FA default by environment (ADR-026).
 - **Git:** first commit approved by the owner on 2026-10-14; remote `origin` = https://github.com/engrmarcel/ifeanyiosiaku.
 
 ## Next actions
 
 1. Confirm the first push reached GitHub and check the CI run result.
-2. Ask the owner which Hostinger plan they hold.
-3. Close the M1 leftovers that block M2: Toast + ErrorState components.
-4. Start Milestone 2 (media library → pages/revisions → block registry → homepage sections).
+2. Close the M1 leftovers that block M2: Toast + ErrorState components.
+3. Start Milestone 2 (media library → pages/revisions → block registry → homepage sections).
 
 ## Environment notes (this machine)
 
@@ -31,5 +31,6 @@ Keep this file current so any session can continue without repeating work.
 - Next.js 16: read `apps/web/node_modules/next/dist/docs/` before using unfamiliar APIs (Cache Components is on;
   request-time values such as `searchParams` must sit inside `<Suspense>`).
 - Portrait: `apps/web/public/brand/ifeanyi-osiaku-portrait.jpg` (supplied 2026-10-14; used on the interim homepage and as the default social preview). Moves into the media library in Milestone 2.
-- Hosting: Hostinger, plan tier unconfirmed (VPS KVM 2 recommended). See DEPLOYMENT_PLAN.md §2.1.
+- Hosting: Hostinger VPS, KVM 2 or larger (decided 2026-10-15). See DEPLOYMENT_PLAN.md §2.1.
+- Staff 2FA is NOT required locally (ADR-026); tests force it on via phpunit.xml.
 - Visual checks: drive the installed Chrome through the DevTools protocol for real device widths (plain headless Chrome cannot go below 512px).

@@ -2,6 +2,7 @@
 
 use App\Domain\Captcha\Http\VerifyCaptcha;
 use App\Domain\Identity\Http\EnsureAccountIsActive;
+use App\Domain\Settings\Http\EnsureAddonEnabled;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -47,6 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'captcha' => VerifyCaptcha::class,
+            'addon' => EnsureAddonEnabled::class,
         ]);
 
         // Signed-out visitors are sent to the website's login page (the admin panel has no login of its own).

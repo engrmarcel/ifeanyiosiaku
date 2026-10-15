@@ -80,7 +80,7 @@ export function TwoFactorSection() {
 
   const disable = () =>
     run(async () => {
-      if (user.is_staff && !window.confirm("Staff accounts cannot open the admin panel without two-factor authentication. Turn it off anyway?")) return;
+      if (user.two_factor_required && !window.confirm("Staff accounts cannot open the admin panel without two-factor authentication. Turn it off anyway?")) return;
       await withConfirmation(() => api("/api/v1/auth/user/two-factor-authentication", { method: "DELETE" }));
       setStage("idle");
       setCodes([]);
@@ -95,7 +95,7 @@ export function TwoFactorSection() {
       <div className="flex flex-col gap-4">
         {setupRequested && !user.two_factor_enabled && (
           <Alert tone="warning" title="Two-factor authentication is required">
-            {user.is_staff ? "Staff accounts must turn this on before using the admin panel." : "Please turn on two-factor authentication to continue."}
+            {user.two_factor_required ? "Staff accounts must turn this on before using the admin panel." : "Please turn on two-factor authentication to continue."}
           </Alert>
         )}
         {error && <Alert tone="error">{error}</Alert>}

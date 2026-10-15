@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAddon } from "@/lib/settings/SiteSettingsProvider";
 import { VerifiedBanner } from "./VerifiedBanner";
 
 export default function AccountPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
+  const commerce = useAddon("commerce");
+  const learning = useAddon("learning");
 
   if (!user) return null;
 
@@ -49,7 +52,7 @@ export default function AccountPage() {
         </Alert>
       )}
 
-      {user.is_staff && !user.two_factor_enabled && (
+      {user.two_factor_required && !user.two_factor_enabled && (
         <Alert tone="warning" title="Two-factor authentication required">
           Staff accounts must turn on two-factor authentication before using the admin panel.{" "}
           <Link href="/account/security?setup=two-factor" className="text-accent hover:underline">
@@ -70,10 +73,21 @@ export default function AccountPage() {
           </Button>
         </Card>
 
-        <Card>
-          <CardHeader title="Learning & purchases" description="Your courses, downloads and orders will appear here." />
-          <EmptyState title="Nothing yet" description="Courses and digital products arrive in upcoming releases." />
-        </Card>
+        {(commerce || learning) && (
+          <Card>
+            <CardHeader
+              title={commerce && learning ? "Learning & purchases" : learning ? "Learning" : "Purchases"}
+              description={
+                commerce && learning
+                  ? "Your courses, downloads and orders will appear here."
+                  : learning
+                    ? "Your courses and progress will appear here."
+                    : "Your downloads and orders will appear here."
+              }
+            />
+            <EmptyState title="Nothing yet" description="These features arrive in upcoming releases." />
+          </Card>
+        )}
       </div>
 
       {user.can_access_admin && (

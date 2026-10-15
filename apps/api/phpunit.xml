@@ -30,6 +30,8 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="CAPTCHA_DRIVER" value="first_party"/>
         <env name="CAPTCHA_DIFFICULTY" value="8"/>
+        <!-- Tests exercise the production security behaviour (staff must have 2FA). -->
+        <env name="REQUIRE_STAFF_TWO_FACTOR" value="true"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

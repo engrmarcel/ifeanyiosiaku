@@ -2,13 +2,14 @@
 
 namespace App\Domain\Identity\Http;
 
+use App\Domain\Settings\SettingsRepository;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 
 class CurrentUserController
 {
-    public function __invoke(#[CurrentUser] User $user): JsonResponse
+    public function __invoke(#[CurrentUser] User $user, SettingsRepository $settings): JsonResponse
     {
         $user->load('profile');
 
@@ -20,6 +21,8 @@ class CurrentUserController
             'timezone' => $user->timezone ?? config('platform.display_timezone'),
             'two_factor_enabled' => $user->hasConfirmedTwoFactor(),
             'is_staff' => $user->isStaff(),
+            // True when this account must enrol in 2FA before the admin panel opens (ADR-026).
+            'two_factor_required' => $user->isStaff() && $settings->bool('security.require_staff_two_factor'),
             'can_access_admin' => $user->canAccessPanel(filament()->getDefaultPanel()),
             'roles' => $user->getRoleNames()->values(),
             'profile' => $user->profile ? [

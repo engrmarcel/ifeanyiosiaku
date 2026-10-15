@@ -96,6 +96,17 @@ it('keeps audit log entries immutable', function () {
         ->and(fn () => $entry->delete())->toThrow(LogicException::class);
 });
 
+it('tells staff whether two-factor authentication is required for them', function () {
+    $staff = User::factory()->role(Role::Editor)->create()->fresh();
+    $member = User::factory()->create()->fresh();
+
+    $this->actingAs($staff)->withHeaders($this->apiHeaders())->getJson('/api/v1/me')->assertJsonPath('data.two_factor_required', true);
+    $this->actingAs($member)->withHeaders($this->apiHeaders())->getJson('/api/v1/me')->assertJsonPath('data.two_factor_required', false);
+
+    app(SettingsRepository::class)->set('security.require_staff_two_factor', false);
+    $this->actingAs($staff)->withHeaders($this->apiHeaders())->getJson('/api/v1/me')->assertJsonPath('data.two_factor_required', false);
+});
+
 it('returns the current user without sensitive fields', function () {
     $user = User::factory()->withTwoFactor()->withProfile()->create();
 

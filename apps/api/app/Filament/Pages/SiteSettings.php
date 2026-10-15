@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Domain\Captcha\CaptchaManager;
 use App\Domain\Identity\Enums\Permission;
 use App\Domain\Identity\Enums\Role;
+use App\Domain\Settings\Enums\Addon;
 use App\Domain\Settings\SettingsRepository;
 use App\Models\User;
 use BackedEnum;
@@ -38,6 +39,10 @@ class SiteSettings extends Page
         'announcements.enabled' => 'bool',
         'security.require_staff_two_factor' => 'bool',
         'captcha.driver' => 'string',
+        'addons.commerce.enabled' => 'bool',
+        'addons.learning.enabled' => 'bool',
+        'addons.community.enabled' => 'bool',
+        'addons.rewards.enabled' => 'bool',
     ];
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
@@ -77,6 +82,15 @@ class SiteSettings extends Page
         return $schema
             ->statePath('data')
             ->components([
+                Section::make('Add-on modules')
+                    ->description('Switch optional parts of the platform on or off. A module that is off disappears from the website and its pages cannot be opened. Data is kept, so switching it back on restores everything.')
+                    ->columns(2)
+                    ->schema(array_map(
+                        fn (Addon $addon) => Toggle::make(self::field($addon->settingKey()))
+                            ->label($addon->label())
+                            ->helperText($addon->description()),
+                        Addon::cases(),
+                    )),
                 Section::make('Content protection')
                     ->description('Discourages visitors from saving images, right-clicking, or opening the browser\'s "Inspect" tools on the public website. Signed-in staff are not affected. This deters casual copying but cannot fully prevent it: screenshots and browser menus remain available.')
                     ->schema([
@@ -99,7 +113,7 @@ class SiteSettings extends Page
                     ->schema([
                         Toggle::make(self::field('security.require_staff_two_factor'))
                             ->label('Require two-factor authentication for staff')
-                            ->helperText('Strongly recommended. Only a Super Administrator can change this.')
+                            ->helperText('Off by default while developing; on by default in production. Strongly recommended for the live site. Only a Super Administrator can change this.')
                             ->disabled(! $isSuperAdmin),
                         Select::make(self::field('captcha.driver'))
                             ->label('Form verification (CAPTCHA) provider')
