@@ -38,6 +38,17 @@ return [
             'report' => false,
         ],
 
+        // Public media library files (images and their resized variants). Served at /media/... by
+        // MediaFileController locally; in production Nginx serves this folder directly (DEPLOYMENT_PLAN).
+        'media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/media'),
+            'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/').'/media',
+            'visibility' => 'public',
+            'throw' => true,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

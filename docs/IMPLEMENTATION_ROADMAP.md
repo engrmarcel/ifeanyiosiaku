@@ -100,7 +100,7 @@ receives 403 on admin endpoints; staff without 2FA forced to enrol; CAPTCHA matr
 provider failure/rate limit); CSRF rejection; health endpoints respond; CI green.
 
 ### Milestone 2 — Brand website and CMS
-- [ ] Media library (upload validation, variants, alt text, usages, private/public disks)
+- [x] Media library: real-type detection, size/dimension limits, re-encoding (strips EXIF/GPS), WebP variants, required alt text, duplicate detection, usage tracking blocks deletion, `/media` serving with safe headers, admin screens, content permissions (cms.manage/publish/raw_html, media.manage). Private disk for paid files arrives with Commerce (M3).
 - [ ] Pages + immutable revisions + draft/preview/publish/schedule + restore
 - [ ] Block schema registry (PHP + Zod) for all block types in REQ-CMS-4; Filament builder forms
 - [ ] Code block / terminal panel with Shiki, line numbers, highlights, copy, annotations

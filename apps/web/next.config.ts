@@ -12,6 +12,8 @@ const apiOrigin = (process.env.API_INTERNAL_URL ?? "http://127.0.0.1:8110").repl
 
 const laravelPaths = [
   "/api/:path*",
+  // Media library files (served directly by the web server in production).
+  "/media/:path*",
   "/admin",
   "/admin/:path*",
   // Filament (admin panel) assets and Livewire endpoints.

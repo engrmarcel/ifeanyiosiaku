@@ -65,9 +65,9 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `media_assets` | ulid, disk (`public/private`), path, mime, size, width, height, alt_text, description, title, checksum_sha256, uploaded_by | index (mime), unique(checksum, disk) optional |
-| `media_variants` | media_asset_id, variant (`thumb/md/lg/og/avif`), path, width, height | cascade with asset |
-| `media_usages` | media_asset_id, usable_type, usable_id, field | lets admin see where an image is used and blocks unsafe deletion |
+| `media_assets` | ulid, disk (`media` public / private later), directory, filename, original_name, mime, size, width, height, title, alt_text, description, checksum_sha256 (duplicate detection), uploaded_by | **implemented M2**; index (mime), index (checksum_sha256) |
+| `media_variants` | media_asset_id, variant (`sm` 320 / `md` 768 / `lg` 1280 / `xl` 1920, WebP), filename, mime, width, height, size | **implemented M2**; unique (asset, variant); cascade with asset |
+| `media_usages` | media_asset_id, usable_type, usable_id, field | **implemented M2**; RESTRICT delete of in-use assets; unique per (asset, usable, field) |
 | `pages` | ulid, title, slug (unique), template, status (`draft/scheduled/published/archived`), published_revision_id, draft_revision_id, publish_at, unpublish_at, is_homepage (one true), author_id | index (status, publish_at) |
 | `page_revisions` | page_id, number, title, blocks JSON, schema_version, seo JSON, created_by, created_at, note | immutable once published |
 | `section_templates` | name, type, blocks JSON | reusable sections |

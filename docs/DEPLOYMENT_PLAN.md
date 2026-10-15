@@ -75,7 +75,7 @@ apex ifeanyiosiaku.online → 301 → www
 |---|---|---|
 | CI | Every push / PR | Install, lint, typecheck, unit + feature tests (MySQL 8.4, Redis), `composer audit`, `npm audit`, build |
 | Staging | Merge to `main` | Deploy to `staging.<domain>` with sandbox credentials; run migrations; smoke tests; Playwright journeys |
-| Production | Manual approval / tag | Backup DB → zero-downtime deploy (release directories + symlink) → `migrate --force` → cache config/routes/views → restart workers → health check → automatic rollback on failure |
+| Production | Manual approval / tag | Backup DB → zero-downtime deploy (release directories + symlink) → `migrate --force` → `db:seed --class=RolesAndPermissionsSeeder --force` (syncs new permissions) → cache config/routes/views → restart workers → health check → automatic rollback on failure |
 
 ## 5. Production readiness gates (must all be true before launch)
 

@@ -2,6 +2,7 @@
 
 use App\Domain\Captcha\Http\VerifyCaptcha;
 use App\Domain\Identity\Http\EnsureAccountIsActive;
+use App\Domain\Media\Http\MediaFileController;
 use App\Domain\Settings\Http\EnsureAddonEnabled;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\SecurityHeaders;
@@ -29,6 +30,11 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware(['web', 'throttle:api'])
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
+
+            // Public media files: no session or cookies needed.
+            Route::get('media/{path}', MediaFileController::class)
+                ->where('path', '[A-Za-z0-9/_.\-]+')
+                ->name('media.file');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
