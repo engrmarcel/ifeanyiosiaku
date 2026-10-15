@@ -2,10 +2,12 @@
 
 use App\Domain\Captcha\Http\CaptchaController;
 use App\Domain\Cms\Http\PageController;
+use App\Domain\Cms\Http\SitemapController;
 use App\Domain\Identity\Http\CurrentUserController;
 use App\Domain\Identity\Http\SessionController;
 use App\Domain\Portfolio\Http\ProjectController;
 use App\Domain\Settings\Http\PublicSettingsController;
+use App\Domain\Settings\Http\SiteConfigController;
 use App\Http\Controllers\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('csrf-cookie', fn () => response()->noContent())->name('csrf-cookie');
     Route::get('health', HealthController::class)->name('health');
     Route::get('settings/public', PublicSettingsController::class)->name('settings.public');
+    Route::get('site', SiteConfigController::class)->name('site');
+    Route::get('sitemap', SitemapController::class)->name('sitemap');
 
     Route::get('page-resolve', [PageController::class, 'resolve'])->name('pages.resolve');
     Route::get('projects/{slug}', [ProjectController::class, 'show'])

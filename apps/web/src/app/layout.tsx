@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { CSSProperties } from "react";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -7,12 +8,12 @@ import { ContentProtection } from "@/components/protection/ContentProtection";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsProvider";
+import { getSiteConfig } from "@/lib/site/config";
+import { SITE_URL } from "@/lib/site/url";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3100";
-
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+const baseMetadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Ifeanyi Osiaku — Software, AI & Data",
     template: "%s · Ifeanyi Osiaku",
@@ -32,9 +33,24 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+/** Search engines are asked to skip every page while indexing is switched off in Site settings. */
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSiteConfig();
+  return site.indexing ? baseMetadata : { ...baseMetadata, robots: { index: false, follow: false } };
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const site = await getSiteConfig();
+  const { tokens } = site.theme;
+  // The administrator's accent colour, applied through the design tokens in globals.css.
+  const theme = {
+    "--io-accent": tokens.accent,
+    "--io-accent-strong": tokens.accentStrong,
+    "--io-accent-ink": tokens.accentInk,
+  } as CSSProperties;
+
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}>
+    <html lang="en" style={theme} className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
@@ -46,11 +62,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AuthProvider>
             <ToastProvider>
               <ContentProtection />
-              <SiteHeader />
+              <SiteHeader name={site.name} links={site.navigation.header} />
               <main id="main" className="flex flex-1 flex-col">
                 {children}
               </main>
-              <SiteFooter />
+              <SiteFooter site={site} />
             </ToastProvider>
           </AuthProvider>
         </SiteSettingsProvider>

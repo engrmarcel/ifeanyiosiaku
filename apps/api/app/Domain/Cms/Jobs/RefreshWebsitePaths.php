@@ -24,8 +24,9 @@ class RefreshWebsitePaths implements ShouldQueue
 
     /**
      * @param  list<string>  $paths
+     * @param  list<string>  $tags  Other cached content, e.g. "site" for the shared header and footer.
      */
-    public function __construct(public readonly array $paths) {}
+    public function __construct(public readonly array $paths, public readonly array $tags = []) {}
 
     public function handle(): void
     {
@@ -33,7 +34,7 @@ class RefreshWebsitePaths implements ShouldQueue
         $url = rtrim((string) config('platform.web_internal_url'), '/').'/internal/revalidate';
 
         if (strlen($secret) < 32) {
-            Log::info('Website refresh skipped: WEB_REVALIDATE_SECRET is not set (pages refresh within an hour).', ['paths' => $this->paths]);
+            Log::info('Website refresh skipped: WEB_REVALIDATE_SECRET is not set (pages refresh within an hour).', ['paths' => $this->paths, 'tags' => $this->tags]);
 
             return;
         }
@@ -41,7 +42,7 @@ class RefreshWebsitePaths implements ShouldQueue
         Http::timeout(10)
             ->withHeaders(['X-Revalidate-Secret' => $secret])
             ->acceptJson()
-            ->post($url, ['paths' => $this->paths])
+            ->post($url, ['paths' => $this->paths, 'tags' => $this->tags])
             ->throw();
     }
 }

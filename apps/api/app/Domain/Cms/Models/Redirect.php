@@ -2,6 +2,8 @@
 
 namespace App\Domain\Cms\Models;
 
+use App\Policies\RedirectPolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,7 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $status_code
  * @property int $hits
  * @property bool $is_automatic
+ * @property int|null $created_by
  */
+#[UsePolicy(RedirectPolicy::class)]
 class Redirect extends Model
 {
     protected $guarded = ['id'];

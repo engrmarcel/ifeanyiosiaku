@@ -3,19 +3,6 @@
 use App\Domain\Cms\Actions\PublishPage;
 use App\Domain\Cms\Actions\SavePageDraft;
 use App\Domain\Cms\Actions\SetHomepage;
-use App\Domain\Cms\Models\Page;
-
-function resolvePath(string $path)
-{
-    return test()->withHeaders(test()->apiHeaders())->getJson('/api/v1/page-resolve?path='.urlencode($path));
-}
-
-function livePage(string $slug): Page
-{
-    $page = app(SavePageDraft::class)->handle(new Page, ['title' => ucfirst($slug), 'slug' => $slug, 'blocks' => []], null);
-
-    return app(PublishPage::class)->handle($page, null);
-}
 
 it('reports published pages, redirects and missing addresses', function () {
     $page = livePage('about');

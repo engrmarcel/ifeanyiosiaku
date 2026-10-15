@@ -3,7 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MediaImage } from "@/components/blocks/MediaImage";
 import { SafeHtml } from "@/components/blocks/SafeHtml";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getProject } from "@/lib/cms/projects";
+import { projectSchema } from "@/lib/seo/structuredData";
+import { getSiteConfig } from "@/lib/site/config";
 
 /** Case study page. The proxy has already returned a real 404 for unknown projects. */
 export const instant = false;
@@ -31,7 +34,7 @@ export async function generateMetadata({ params }: PageProps<"/projects/[slug]">
 
 export default async function ProjectPage({ params }: PageProps<"/projects/[slug]">) {
   const { slug } = await params;
-  const project = await getProject(slug);
+  const [project, site] = await Promise.all([getProject(slug), getSiteConfig()]);
   if (!project) notFound();
 
   const facts = [
@@ -42,6 +45,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
 
   return (
     <article className="flex flex-1 flex-col pb-20">
+      <JsonLd data={projectSchema(project, site)} />
       <header className="relative isolate overflow-hidden border-b border-border/60">
         <div aria-hidden="true" className="io-grid-backdrop pointer-events-none absolute inset-0 -z-10" />
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">

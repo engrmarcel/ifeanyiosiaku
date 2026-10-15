@@ -67,10 +67,9 @@ class PageController
             }
 
             // Case studies live at /projects/{slug}.
-            if (preg_match('#^/projects/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)) {
-                return Project::query()->published()->where('slug', $m[1])->exists()
-                    ? ['status' => 'page']
-                    : ['status' => 'missing'];
+            if (preg_match('#^/projects/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)
+                && Project::query()->published()->where('slug', $m[1])->exists()) {
+                return ['status' => 'page'];
             }
 
             $slug = ltrim($path, '/');
@@ -82,12 +81,18 @@ class PageController
                 return $page->is_homepage ? ['status' => 'redirect', 'to' => '/', 'code' => 301] : ['status' => 'page'];
             }
 
-            $redirect = Redirect::query()->where('from_path', $path)->first(['to_path', 'status_code']);
+            $redirect = Redirect::query()->where('from_path', $path)->first(['id', 'to_path', 'status_code']);
 
             return $redirect
-                ? ['status' => 'redirect', 'to' => $redirect->to_path, 'code' => $redirect->status_code]
+                ? ['status' => 'redirect', 'to' => $redirect->to_path, 'code' => $redirect->status_code, 'redirect_id' => $redirect->id]
                 : ['status' => 'missing'];
         });
+
+        // Count each use of a redirect, so editors can see which old addresses still get visitors.
+        if (isset($result['redirect_id'])) {
+            Redirect::query()->whereKey($result['redirect_id'])->increment('hits');
+            unset($result['redirect_id']);
+        }
 
         return response()->json(['data' => $result]);
     }

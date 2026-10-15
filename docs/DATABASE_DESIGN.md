@@ -44,7 +44,7 @@ erDiagram
 | `sessions` | Laravel database session table (id, user_id, ip_address, user_agent, last_activity) | enables "sign out other sessions" |
 | `password_reset_tokens` | email, hashed token, created_at | Laravel standard |
 | `user_preferences` | user_id, key, value JSON | unique (user_id, key) |
-| `settings` | group, key, value JSON, is_public | **no secrets** (secrets live in env/secret manager) |
+| `settings` | group, key, value JSON, is_public | **no secrets** (secrets live in env/secret manager). Site-wide keys include `navigation.header`, `navigation.footer`, `social.links`, `site.footer_note`, `theme.accent`, `seo.allow_indexing` (ADR-028) |
 | `audit_logs` | ulid, actor_id (nullable), action, subject_type, subject_id, changes JSON, ip, user_agent, request_id, created_at | insert-only; index (subject_type, subject_id), (actor_id, created_at) |
 
 ### 2.2 Media, CMS, publishing
@@ -72,7 +72,7 @@ erDiagram
 | `page_revisions` | page_id, number (unique per page), kind (`draft/publish/restore`), title, slug, blocks JSON, seo JSON, schema_version, note, created_by, created_at | **implemented M2**; immutable; last 50 draft snapshots kept, publish/restore kept forever |
 | `section_templates` | name, type, blocks JSON | reusable sections |
 | `navigation_menus` | key (`header/footer/social`), items JSON | |
-| `redirects` | from_path (unique), to_path, status_code, hits, is_automatic, created_by | **implemented M2**; auto-created when a published page changes address; chains collapsed, loops removed |
+| `redirects` | from_path (unique), to_path, status_code, hits, is_automatic, created_by | **implemented M2**; auto-created when a published page changes address, or added by editors (to a site path or https:// address); chains collapsed, loops refused; hits counted on each use |
 | `seo_meta` | seoable_type/id, title, description, canonical_url, robots, og_media_id, schema_type, extra JSON | |
 | `projects` | ulid, slug, title, summary, body (sanitised HTML), role, client, period, technologies JSON, links JSON, cover_media_id (FK, RESTRICT), is_featured, status, published_at, sort_order, soft deletes | **implemented M2** |
 | `skills` | name, group (`expertise`/`technology`), description, sort_order, is_visible | **implemented M2**; unique (group, name); no invented proficiency levels |

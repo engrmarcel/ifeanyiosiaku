@@ -29,7 +29,7 @@ export function TerminalPanel({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border border-border-strong bg-surface shadow-[0_40px_120px_-50px_rgb(163_247_191/0.35)]",
+        "relative overflow-hidden rounded-lg border border-border-strong bg-surface shadow-[0_40px_120px_-50px_color-mix(in_srgb,var(--io-accent)_35%,transparent)]",
         animate && "io-term-animate",
         className,
       )}

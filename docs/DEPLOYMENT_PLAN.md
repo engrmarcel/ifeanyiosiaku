@@ -92,6 +92,7 @@ apex ifeanyiosiaku.online → 301 → www
 - [ ] Error monitoring receiving events
 - [ ] Legal pages approved by owner (privacy, terms, refunds, reward-credit terms)
 - [ ] Milestone 8 test and security pass complete
+- [ ] Website `NEXT_PUBLIC_SITE_URL` set to the public https:// address (used in the sitemap, robots.txt and search-engine data); "Let search engines list this website" is ON for the live site and OFF on any test copy
 - [ ] Starting content installed once: `php artisan db:seed --class=InitialContentSeeder --force` (safe to re-run; never overwrites edits)
 
 ## 6. Backups (summary — full procedure in BACKUP_AND_RECOVERY.md, M9)

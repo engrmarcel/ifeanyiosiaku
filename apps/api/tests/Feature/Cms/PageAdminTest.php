@@ -5,14 +5,8 @@ use App\Domain\Cms\Models\Page;
 use App\Domain\Identity\Enums\Role;
 use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
-use App\Models\User;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-
-function contentStaff(Role $role = Role::Editor): User
-{
-    return User::factory()->withTwoFactor()->role($role)->create()->fresh();
-}
 
 /** Builder state is keyed by item UUID inside Livewire. */
 function builderState(array $blocks): array

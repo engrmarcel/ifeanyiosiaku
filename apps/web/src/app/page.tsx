@@ -4,6 +4,9 @@ import { CmsPageView } from "@/components/cms/CmsPageView";
 import { InterimHome } from "@/components/home/InterimHome";
 import { cmsMetadata } from "@/lib/cms/metadata";
 import { getPublishedPage, type PageLookup } from "@/lib/cms/pages";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { homepageSchema } from "@/lib/seo/structuredData";
+import { getSiteConfig } from "@/lib/site/config";
 
 /** The CMS homepage once one is published; the interim design before that. */
 export const instant = false;
@@ -26,6 +29,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const result = await homepage();
-  return result.kind === "page" ? <CmsPageView page={result.page} /> : <InterimHome />;
+  const [result, site] = await Promise.all([homepage(), getSiteConfig()]);
+
+  return (
+    <>
+      <JsonLd data={homepageSchema(site)} />
+      {result.kind === "page" ? <CmsPageView page={result.page} /> : <InterimHome />}
+    </>
+  );
 }

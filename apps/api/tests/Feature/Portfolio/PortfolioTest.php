@@ -31,20 +31,6 @@ function portfolioPage(array $blocks): array
     return test()->withHeaders(test()->apiHeaders())->getJson('/api/v1/pages/work')->assertOk()->json('data.blocks');
 }
 
-function project(array $overrides = []): Project
-{
-    return Project::query()->create([
-        'slug' => 'sales-dashboard',
-        'title' => 'Sales dashboard',
-        'summary' => 'Regional revenue at a glance.',
-        'technologies' => ['Power BI', 'DAX'],
-        'status' => 'published',
-        'published_at' => now()->subDay(),
-        'is_featured' => true,
-        ...$overrides,
-    ]);
-}
-
 it('shows only published, featured projects in a featured projects block', function () {
     project();
     project(['slug' => 'draft-one', 'title' => 'Draft', 'status' => 'draft']);

@@ -397,3 +397,36 @@ would return 200 (with a noindex tag) and a moved page would redirect client-sid
 - **Animation:** the terminal reveal is pure CSS, always ends visible, and is skipped for reduced motion. The Motion
   library was removed (no longer used), reducing JavaScript sent to visitors; ADR-019's animation choice is updated
   accordingly.
+
+## ADR-028 — Site-wide navigation, appearance, redirects and search-engine data
+**Status:** Accepted · 2026-10-15
+
+**Context.** The owner needs to change the menu, footer, social links and colours without a developer, add
+redirects for old or printed addresses, and have the site understood by search engines, all without risking
+broken or unsafe links.
+
+**Decision.**
+- **Navigation & footer** (Admin → Content → Navigation & footer, `cms.manage`): header links (max 8), footer links
+  (max 12), social profiles (max 10, only real accounts; starts empty), footer line and accent colour, stored as
+  settings and audit-logged. Links must be site paths, `#anchors`, `https://`/`http://` or `mailto:` (same rule as
+  blocks); anything else is dropped on save and again when served. A link can be tied to an add-on and is hidden
+  while that add-on is off (ADR-025).
+- **Accent colour is a preset, not free colour input.** Five presets, each verified by an automated contrast test
+  (WCAG AAA, ≥ 7:1) on the site background and under button text. Values reach the website as CSS custom
+  properties validated as `#rrggbb`, so no CSS can be injected. All glows derive from the accent variable.
+- **Shared layout data:** the website reads `GET /api/v1/site` with `"use cache"` + tag `site`; Laravel refreshes it
+  (`RefreshWebsitePaths` now also carries allow-listed tags) when navigation, theme, profile, site, SEO or add-on
+  settings change. If the API is unreachable (e.g. during a build) the built-in defaults are cached for one minute
+  only, then retried — verified locally: the build-time fallback replaced itself within about 10 seconds.
+- **Manual redirects** (Admin → Content → Redirects; editing needs `cms.publish`): old address → site path or
+  `https://` address, permanent (301) or temporary (302). Refused: website-owned addresses, the address of a live
+  page (the page would always win), self-redirects and chains; redirects pointing at a newly redirected address are
+  repointed straight to the final destination. Each use is counted. Old `/projects/…` addresses can be redirected.
+- **Search engines:** `/sitemap.xml` lists published pages without `noindex` or an external canonical, plus
+  published case studies; `/robots.txt` keeps private areas (admin, account, auth, preview, API) out. A Site
+  settings switch "Let search engines list this website" (default ON) empties the sitemap, blocks all crawling in
+  robots.txt and adds `noindex` to every page — intended for test copies. JSON-LD (`Person` + `WebSite` on the
+  homepage, `CreativeWork` on case studies) is built only from real profile fields; it is serialised with `<`
+  escaped so content cannot break out of the script tag (tested).
+- **Social links are shown as text labels**, not brand logos, matching the terminal style and avoiding inaccurate
+  hand-drawn logos.

@@ -26,6 +26,21 @@ return [
     'defaults' => [
         'site.name' => 'Ifeanyi Osiaku',
         'site.tagline' => 'Software Developer | AI Enthusiast | Business Intelligence & Data Analytics Professional',
+        'site.footer_note' => 'Software · AI · Business Intelligence · Data',
+
+        // Header and footer links, social profiles and accent colour (Admin → Content → Navigation & footer).
+        // Social profiles start empty: only real accounts are added, by the owner.
+        'navigation.header' => [
+            ['label' => 'About', 'url' => '/#about', 'new_tab' => false, 'addon' => null],
+            ['label' => 'Work', 'url' => '/#work', 'new_tab' => false, 'addon' => null],
+            ['label' => 'Services', 'url' => '/#services', 'new_tab' => false, 'addon' => null],
+        ],
+        'navigation.footer' => [],
+        'social.links' => [],
+        'theme.accent' => 'green',
+
+        // Search engines may index the public website. Turn off to hide it (e.g. on a staging copy).
+        'seo.allow_indexing' => true,
 
         // The announcement popup is OFF until an administrator switches it on (REQ-ANN-1).
         'announcements.enabled' => false,

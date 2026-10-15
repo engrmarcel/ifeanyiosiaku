@@ -364,7 +364,7 @@ export function TableBlock({ props, anchor }: Base & { props: BlockProps<"table"
 export function CtaBlock({ props, anchor }: Base & { props: BlockProps<"cta"> }) {
   return (
     <Section id={anchor}>
-      <div className="relative overflow-hidden rounded-lg border border-border-strong bg-surface px-6 py-12 text-center shadow-[0_30px_100px_-60px_rgb(163_247_191/0.5)] sm:px-12">
+      <div className="relative overflow-hidden rounded-lg border border-border-strong bg-surface px-6 py-12 text-center shadow-[0_30px_100px_-60px_color-mix(in_srgb,var(--io-accent)_50%,transparent)] sm:px-12">
         <div aria-hidden="true" className="io-grid-backdrop pointer-events-none absolute inset-0" />
         <div className="relative">
           {props.eyebrow && <p className="font-mono text-sm text-accent">{props.eyebrow}</p>}

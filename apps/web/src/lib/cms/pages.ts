@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { serverGet } from "@/lib/api/server";
+import { isSafeRedirectTarget } from "./redirects";
 import type { CmsPage } from "./schemas";
 
 export type PageLookup =
@@ -29,7 +30,7 @@ export async function getPublishedPage(path: string): Promise<PageLookup> {
   if (status === 200 && body?.data) return { kind: "page", page: body.data };
 
   const redirect = body?.error?.redirect;
-  if (status === 404 && redirect && redirect.to.startsWith("/") && !redirect.to.startsWith("//")) {
+  if (status === 404 && redirect && isSafeRedirectTarget(redirect.to)) {
     return { kind: "redirect", to: redirect.to, status: redirect.status === 302 ? 302 : 301 };
   }
 

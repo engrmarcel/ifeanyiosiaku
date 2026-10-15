@@ -38,9 +38,17 @@ describe("POST /internal/revalidate", () => {
     const response = await call({ "x-revalidate-secret": SECRET }, { paths: ["/about", "/", "https://evil.example", 42] });
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ revalidated: ["/about", "/"] });
+    expect(await response.json()).toEqual({ revalidated: ["/about", "/"], tags: [] });
     expect(revalidateTag).toHaveBeenCalledWith("page:/about", { expire: 0 });
     expect(revalidateTag).toHaveBeenCalledWith("page:/", { expire: 0 });
     expect(revalidateTag).toHaveBeenCalledWith("sitemap", { expire: 0 });
+  });
+
+  it("refreshes only known shared caches by name", async () => {
+    const response = await call({ "x-revalidate-secret": SECRET }, { paths: [], tags: ["site", "pages", "anything"] });
+
+    expect(await response.json()).toEqual({ revalidated: [], tags: ["site"] });
+    expect(revalidateTag).toHaveBeenCalledWith("site", { expire: 0 });
+    expect(revalidateTag).not.toHaveBeenCalledWith("pages", { expire: 0 });
   });
 });

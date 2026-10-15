@@ -11,6 +11,8 @@ export async function serverGet<T>(path: string): Promise<ServerResponse<T>> {
   const response = await fetch(`${API_ORIGIN}${path}`, {
     headers: { Accept: "application/json" },
     cache: "no-store",
+    // Never let a slow API hang a page render or a build.
+    signal: AbortSignal.timeout(8000),
   });
 
   const text = await response.text();

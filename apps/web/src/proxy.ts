@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isSafeRedirectTarget } from "@/lib/cms/redirects";
 
 const API_ORIGIN = (process.env.API_INTERNAL_URL ?? "http://127.0.0.1:8110").replace(/\/$/, "");
 
@@ -25,7 +26,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (resolution.status === "redirect" && resolution.to.startsWith("/") && !resolution.to.startsWith("//")) {
+  if (resolution.status === "redirect" && isSafeRedirectTarget(resolution.to)) {
     return NextResponse.redirect(new URL(resolution.to, request.url), resolution.code === 302 ? 302 : 301);
   }
 

@@ -106,8 +106,8 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 - [x] Code block / terminal panel with Shiki, line numbers, highlights, copy, annotations (verified in Chrome)
 - [ ] Markdown article layout; articles, categories, tags, publications + versions
 - [x] Portfolio: Profile page (name, headline, bios, years, portrait), projects/case studies (/projects/{slug}), skills & technologies, services, experience (empty), certifications (empty), testimonials (consent required); 7 data-driven blocks; content refreshes the site instantly; media in use is protected
-- [ ] Navigation/header/footer/social config; design token overrides
-- [~] Slugs + automatic redirects; per-page SEO fields (title, description, canonical, noindex, sharing image). **Remaining:** manual redirect admin, sitemap, robots, JSON-LD (step 5)
+- [x] Navigation/header/footer/social config (admin screen; phone menu; add-on-aware links); accent colour presets applied as design tokens (contrast-tested) — ADR-028
+- [x] Slugs + automatic and manual redirects (loop/chain protection, visit counts, https destinations); per-page SEO fields; sitemap.xml, robots.txt, search-engine indexing switch, JSON-LD (Person, WebSite, CreativeWork) — ADR-028
 - [~] Homepage composed of configurable section blocks (hero with portrait + terminal, about, expertise, work, services, call to action), reduced-motion safe. **Remaining:** subtle code-particle/grid motion effects; sections from later modules (courses, products, articles, events, leaderboard) arrive with those modules
 - [ ] Raw HTML block in sandboxed iframe (Super Admin only)
 - [ ] Announcement popup (global OFF default), analytics events

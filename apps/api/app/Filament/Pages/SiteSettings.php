@@ -37,6 +37,7 @@ class SiteSettings extends Page
         'protection.allow_saving_and_inspect' => 'bool',
         'registration.enabled' => 'bool',
         'announcements.enabled' => 'bool',
+        'seo.allow_indexing' => 'bool',
         'security.require_staff_two_factor' => 'bool',
         'captcha.driver' => 'string',
         'addons.commerce.enabled' => 'bool',
@@ -108,6 +109,12 @@ class SiteSettings extends Page
                         Toggle::make(self::field('announcements.enabled'))
                             ->label('Show the homepage announcement popup')
                             ->helperText('Master switch. When off, no announcement is shown even if one is scheduled.'),
+                    ]),
+                Section::make('Search engines')
+                    ->schema([
+                        Toggle::make(self::field('seo.allow_indexing'))
+                            ->label('Let search engines list this website')
+                            ->helperText('On for the live site. Turn off to ask Google and others not to show the site (for example on a test copy). Individual pages can also be hidden in their SEO settings.'),
                     ]),
                 Section::make('Security')
                     ->schema([

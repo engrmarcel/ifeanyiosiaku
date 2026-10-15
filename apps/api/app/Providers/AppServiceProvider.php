@@ -10,6 +10,7 @@ use App\Domain\Identity\Listeners\AuthEventSubscriber;
 use App\Domain\Notifications\Listeners\RecordNotificationDelivery;
 use App\Domain\Portfolio\Blocks\PortfolioBlocks;
 use App\Domain\Settings\Events\SettingChanged;
+use App\Domain\Settings\SiteConfig;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
         Event::subscribe(AuthEventSubscriber::class);
         Event::listen(PageContentChanged::class, [PageCache::class, 'forget']);
         Event::listen(SettingChanged::class, [LivePaths::class, 'settingChanged']);
+        Event::listen(SettingChanged::class, [SiteConfig::class, 'settingChanged']);
         Event::listen(NotificationSent::class, [RecordNotificationDelivery::class, 'sent']);
         Event::listen(NotificationFailed::class, [RecordNotificationDelivery::class, 'failed']);
     }
