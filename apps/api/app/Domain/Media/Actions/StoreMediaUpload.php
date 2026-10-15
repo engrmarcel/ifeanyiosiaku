@@ -28,7 +28,11 @@ class StoreMediaUpload
 
     public const MAX_DIMENSION = 8000;
 
-    public const MAX_PIXELS = 40_000_000;
+    /** 25 megapixels, e.g. 6000 × 4000. Larger photos need too much memory to process safely. */
+    public const MAX_PIXELS = 25_000_000;
+
+    /** Highest memory limit this action may raise PHP to while processing one image. */
+    private const MEMORY_CEILING = 1024 * 1024 * 1024;
 
     /** @var array<string, string> detected MIME => stored extension */
     public const ALLOWED = [
@@ -70,9 +74,15 @@ class StoreMediaUpload
             throw ValidationException::withMessages(['file' => 'This file is not a valid image.']);
         }
 
-        if ($info[0] > self::MAX_DIMENSION || $info[1] > self::MAX_DIMENSION || $info[0] * $info[1] > self::MAX_PIXELS) {
+        if ($info[0] > self::MAX_DIMENSION || $info[1] > self::MAX_DIMENSION) {
             throw ValidationException::withMessages(['file' => 'Images must be at most 8000 × 8000 pixels.']);
         }
+
+        if ($info[0] * $info[1] > self::MAX_PIXELS) {
+            throw ValidationException::withMessages(['file' => 'Images must be at most 25 megapixels (for example 6000 × 4000).']);
+        }
+
+        $this->ensureMemoryFor($info[0], $info[1]);
 
         $checksum = hash_file('sha256', $source);
         $existing = MediaAsset::query()->where('checksum_sha256', $checksum)->first();
@@ -150,6 +160,43 @@ class StoreMediaUpload
 
             throw $e;
         }
+    }
+
+    /**
+     * A decoded image uses about 4 bytes per pixel, plus a rotated copy and the resized variants.
+     * Raise PHP's memory limit for this request when needed (up to MEMORY_CEILING), or refuse
+     * politely instead of crashing the request.
+     */
+    private function ensureMemoryFor(int $width, int $height): void
+    {
+        $needed = memory_get_usage(true) + (int) ($width * $height * 4 * 2.6) + 32 * 1024 * 1024;
+        $limit = $this->bytes((string) ini_get('memory_limit'));
+
+        if ($limit < 0 || $needed <= $limit) {
+            return;
+        }
+
+        if ($needed > self::MEMORY_CEILING || @ini_set('memory_limit', (string) $needed) === false) {
+            throw ValidationException::withMessages(['file' => 'This image is too large for the server to process. Please upload a smaller version.']);
+        }
+    }
+
+    private function bytes(string $value): int
+    {
+        $value = trim($value);
+
+        if ($value === '' || $value === '-1') {
+            return -1;
+        }
+
+        $number = (int) $value;
+
+        return match (strtolower(substr($value, -1))) {
+            'g' => $number * 1024 ** 3,
+            'm' => $number * 1024 ** 2,
+            'k' => $number * 1024,
+            default => $number,
+        };
     }
 
     private function decode(string $source, string $mime): GdImage

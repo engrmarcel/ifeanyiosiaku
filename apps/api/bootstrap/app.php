@@ -37,6 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->name('media.file');
         },
     )
+    ->withCommands([
+        __DIR__.'/../app/Domain/Cms/Console',
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);
         $middleware->append(SecurityHeaders::class);

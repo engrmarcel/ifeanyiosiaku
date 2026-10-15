@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Captcha\Http\CaptchaController;
+use App\Domain\Cms\Http\PageController;
 use App\Domain\Identity\Http\CurrentUserController;
 use App\Domain\Identity\Http\SessionController;
 use App\Domain\Settings\Http\PublicSettingsController;
@@ -18,6 +19,16 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('csrf-cookie', fn () => response()->noContent())->name('csrf-cookie');
     Route::get('health', HealthController::class)->name('health');
     Route::get('settings/public', PublicSettingsController::class)->name('settings.public');
+
+    Route::prefix('pages')->name('pages.')->group(function () {
+        Route::get('home', [PageController::class, 'home'])->name('home');
+        Route::get('{slug}', [PageController::class, 'show'])
+            ->where('slug', '[A-Za-z0-9-/]{1,150}')
+            ->name('show');
+    });
+    Route::get('preview/page', [PageController::class, 'preview'])
+        ->middleware('throttle:30,1')
+        ->name('preview.page');
 
     Route::prefix('captcha')->name('captcha.')->group(function () {
         Route::get('config', [CaptchaController::class, 'config'])->name('config');

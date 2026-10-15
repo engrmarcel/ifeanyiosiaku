@@ -101,13 +101,13 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 
 ### Milestone 2 — Brand website and CMS
 - [x] Media library: real-type detection, size/dimension limits, re-encoding (strips EXIF/GPS), WebP variants, required alt text, duplicate detection, usage tracking blocks deletion, `/media` serving with safe headers, admin screens, content permissions (cms.manage/publish/raw_html, media.manage). Private disk for paid files arrives with Commerce (M3).
-- [ ] Pages + immutable revisions + draft/preview/publish/schedule + restore
-- [ ] Block schema registry (PHP + Zod) for all block types in REQ-CMS-4; Filament builder forms
+- [x] Pages + immutable revisions + draft/preview/publish/schedule + restore (API side; admin editor with Save draft / Preview / Publish / Unpublish / Make homepage / trash; version history with restore; automatic redirects on address change; signed 15-minute preview links; scheduled publish/unpublish job)
+- [~] Block registry with 19 block types, server-side validation and sanitising, Filament builder (reorder, duplicate, hide, anchors). **Remaining:** website renderers + Zod schemas (step 3); data-driven homepage sections (step 4); download and diagram blocks; raw HTML block (step 8)
 - [ ] Code block / terminal panel with Shiki, line numbers, highlights, copy, annotations
 - [ ] Markdown article layout; articles, categories, tags, publications + versions
 - [ ] Portfolio entities: projects, skills, experience (empty), certifications (empty), services, testimonials
 - [ ] Navigation/header/footer/social config; design token overrides
-- [ ] Slugs + redirects; SEO meta, OG images, canonical, sitemap, robots, JSON-LD
+- [~] Slugs + automatic redirects; per-page SEO fields (title, description, canonical, noindex, sharing image). **Remaining:** manual redirect admin, sitemap, robots, JSON-LD (step 5)
 - [ ] Homepage composed of configurable section blocks; cinematic hero; terminal/code/particle effects; reduced-motion fallbacks
 - [ ] Raw HTML block in sandboxed iframe (Super Admin only)
 - [ ] Announcement popup (global OFF default), analytics events

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Domain\Cms\Blocks\BlockRegistry;
+use App\Domain\Cms\Events\PageContentChanged;
+use App\Domain\Cms\PageCache;
 use App\Domain\Identity\Listeners\AuthEventSubscriber;
 use App\Domain\Notifications\Listeners\RecordNotificationDelivery;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -22,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(BlockRegistry::class);
     }
 
     /**
@@ -49,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('captcha', fn (Request $request) => Limit::perMinute(20)->by('captcha:'.$request->ip()));
 
         Event::subscribe(AuthEventSubscriber::class);
+        Event::listen(PageContentChanged::class, [PageCache::class, 'forget']);
         Event::listen(NotificationSent::class, [RecordNotificationDelivery::class, 'sent']);
         Event::listen(NotificationFailed::class, [RecordNotificationDelivery::class, 'failed']);
     }

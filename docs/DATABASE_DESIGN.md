@@ -68,11 +68,11 @@ erDiagram
 | `media_assets` | ulid, disk (`media` public / private later), directory, filename, original_name, mime, size, width, height, title, alt_text, description, checksum_sha256 (duplicate detection), uploaded_by | **implemented M2**; index (mime), index (checksum_sha256) |
 | `media_variants` | media_asset_id, variant (`sm` 320 / `md` 768 / `lg` 1280 / `xl` 1920, WebP), filename, mime, width, height, size | **implemented M2**; unique (asset, variant); cascade with asset |
 | `media_usages` | media_asset_id, usable_type, usable_id, field | **implemented M2**; RESTRICT delete of in-use assets; unique per (asset, usable, field) |
-| `pages` | ulid, title, slug (unique), template, status (`draft/scheduled/published/archived`), published_revision_id, draft_revision_id, publish_at, unpublish_at, is_homepage (one true), author_id | index (status, publish_at) |
-| `page_revisions` | page_id, number, title, blocks JSON, schema_version, seo JSON, created_by, created_at, note | immutable once published |
+| `pages` | ulid, working draft (title, slug unique, template, blocks JSON, seo JSON), is_homepage (exactly one, enforced in SetHomepage), status (`draft/scheduled/published/archived`), published_revision_id, published_at, publish_at, unpublish_at, created_by, updated_by, soft deletes | **implemented M2**; visitors only ever see the published revision |
+| `page_revisions` | page_id, number (unique per page), kind (`draft/publish/restore`), title, slug, blocks JSON, seo JSON, schema_version, note, created_by, created_at | **implemented M2**; immutable; last 50 draft snapshots kept, publish/restore kept forever |
 | `section_templates` | name, type, blocks JSON | reusable sections |
 | `navigation_menus` | key (`header/footer/social`), items JSON | |
-| `redirects` | from_path (unique), to_path, status_code, hits | auto-created on slug change |
+| `redirects` | from_path (unique), to_path, status_code, hits, is_automatic, created_by | **implemented M2**; auto-created when a published page changes address; chains collapsed, loops removed |
 | `seo_meta` | seoable_type/id, title, description, canonical_url, robots, og_media_id, schema_type, extra JSON | |
 | `projects` | slug, title, summary, body blocks JSON, role, tech JSON, links JSON, cover_media_id, featured, sort_order, status, published_at | portfolio/case studies |
 | `skills` | name, group, level (optional), icon, sort_order | |
