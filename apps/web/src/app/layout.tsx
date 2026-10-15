@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ContentProtection } from "@/components/protection/ContentProtection";
+import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsProvider";
 import "./globals.css";
@@ -43,12 +44,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <SiteSettingsProvider>
           <AuthProvider>
-            <ContentProtection />
-            <SiteHeader />
-            <main id="main" className="flex flex-1 flex-col">
-              {children}
-            </main>
-            <SiteFooter />
+            <ToastProvider>
+              <ContentProtection />
+              <SiteHeader />
+              <main id="main" className="flex flex-1 flex-col">
+                {children}
+              </main>
+              <SiteFooter />
+            </ToastProvider>
           </AuthProvider>
         </SiteSettingsProvider>
       </body>

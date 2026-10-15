@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { TextField } from "@/components/ui/TextField";
-import { api } from "@/lib/api/client";
+import { api, ApiError } from "@/lib/api/client";
 import type { AccountSession, DataEnvelope } from "@/lib/api/types";
 import { formErrorMessage } from "@/lib/forms";
 
@@ -26,20 +27,29 @@ export function SessionsSection() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [loadFailed, setLoadFailed] = useState<{ requestId?: string } | null>(null);
+  const [retrying, setRetrying] = useState(false);
 
   const load = useCallback(async () => {
     try {
       setSessions(await fetchSessions());
+      setLoadFailed(null);
     } catch (err) {
-      setError(formErrorMessage(err));
+      setLoadFailed({ requestId: err instanceof ApiError ? err.requestId : undefined });
     }
   }, []);
+
+  async function retry() {
+    setRetrying(true);
+    await load();
+    setRetrying(false);
+  }
 
   useEffect(() => {
     let active = true;
     fetchSessions().then(
       (list) => active && setSessions(list),
-      (err) => active && setError(formErrorMessage(err)),
+      (err) => active && setLoadFailed({ requestId: err instanceof ApiError ? err.requestId : undefined }),
     );
     return () => {
       active = false;
@@ -84,7 +94,14 @@ export function SessionsSection() {
         {error && <Alert tone="error">{error}</Alert>}
         {message && <Alert tone="success">{message}</Alert>}
 
-        {sessions === null ? (
+        {loadFailed && sessions === null ? (
+          <ErrorState
+            description="Your signed-in sessions could not be loaded."
+            onRetry={() => void retry()}
+            retrying={retrying}
+            requestId={loadFailed.requestId}
+          />
+        ) : sessions === null ? (
           <div className="flex flex-col gap-2" aria-busy="true">
             <Skeleton className="h-14" />
             <Skeleton className="h-14" />

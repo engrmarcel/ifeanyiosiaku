@@ -64,7 +64,7 @@ reporting, KPIs and operational health.
 **Acceptance:** documents exist, are mutually consistent, and are reviewed by the owner.
 
 ### Milestone 1 — Foundation
-Status as of 2026-10-15: **core complete and verified; 3 items partially done** (see notes).
+Status as of 2026-10-15: **complete except two items deferred to later milestones** (email-template editor → M7, Playwright → M8).
 
 1. [x] Git repository initialised (`main`), `.gitignore`, `.editorconfig`, `.gitattributes`, deny-all `.htaccess`, README, `.env.example` files; first commit pushed to GitHub (owner approved 2026-10-14)
 2. [x] Laravel 13.36 in `apps/api`; MySQL connection; `ifeanyiosiaku` + `ifeanyiosiaku_testing` databases
@@ -79,7 +79,7 @@ Status as of 2026-10-15: **core complete and verified; 3 items partially done** 
 11. [x] CAPTCHA abstraction: first-party proof-of-work (default), reCAPTCHA, Turnstile; on registration, password reset, and login after 3 failures
 12. [~] Queued verification and reset emails with retries; delivery log (`notification_deliveries`). **Not done:** editable notification templates table — moved to Milestone 7 with the template editor
 13. [x] Filament admin (dark, brand colours): Users (view, filter, suspend, reinstate, change roles), read-only Audit log, and Site settings (content protection, registration, announcement master switch, staff 2FA, CAPTCHA provider — audited)
-14. [~] Design tokens; Button, TextField, Card, Alert, Spinner, Skeleton, EmptyState, Dialog, Tabs, Accordion; reduced-motion support. **Not done:** Toast and a dedicated ErrorState component (Milestone 2)
+14. [x] Design tokens; Button, TextField, Card, Alert, Spinner, Skeleton, EmptyState, ErrorState (retry + support reference), Toast (live-region announcements), Dialog, Tabs, Accordion; reduced-motion support
 15. [x] Website pages: register, login, verify email, forgot/reset password, 2FA challenge, account overview, account security (2FA setup, recovery codes, sessions, password change)
 16. [x] Health: `/up`, `/api/v1/health` (details for permitted staff only), website `/healthz`, scheduler heartbeat
 17. [~] Pest, Larastan (level 8), Pint, Vitest, Testing Library, axe; `scripts/setup.ps1`, `dev.ps1`, `test.ps1`. **Not done:** Playwright browser tests (Milestone 8; an HTTP-level end-to-end smoke test was run instead, see results)
