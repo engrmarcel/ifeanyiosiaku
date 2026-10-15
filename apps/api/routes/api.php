@@ -20,6 +20,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('health', HealthController::class)->name('health');
     Route::get('settings/public', PublicSettingsController::class)->name('settings.public');
 
+    Route::get('page-resolve', [PageController::class, 'resolve'])->name('pages.resolve');
     Route::prefix('pages')->name('pages.')->group(function () {
         Route::get('home', [PageController::class, 'home'])->name('home');
         Route::get('{slug}', [PageController::class, 'show'])

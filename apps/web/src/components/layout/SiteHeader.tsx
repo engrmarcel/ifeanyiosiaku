@@ -27,6 +27,8 @@ export function SiteHeader() {
             <>
               {user.can_access_admin && (
                 <Button asChild variant="ghost" size="sm">
+                  {/* Served by Laravel through the proxy: needs a full page load. */}
+                  {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                   <a href="/admin">Admin</a>
                 </Button>
               )}

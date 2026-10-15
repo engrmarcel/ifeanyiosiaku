@@ -39,7 +39,7 @@ const securityHeaders = [
       "img-src 'self' data: blob:",
       "font-src 'self'",
       "connect-src 'self'",
-      "frame-src https://challenges.cloudflare.com https://www.google.com",
+      "frame-src https://challenges.cloudflare.com https://www.google.com https://www.youtube-nocookie.com https://player.vimeo.com",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",

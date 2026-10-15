@@ -19,7 +19,9 @@ return [
 
     'display_timezone' => env('APP_DISPLAY_TIMEZONE', 'Africa/Lagos'),
 
+    // Shared secret and internal address used to tell the website to refresh cached pages.
     'web_revalidate_secret' => env('WEB_REVALIDATE_SECRET'),
+    'web_internal_url' => env('WEB_INTERNAL_URL', 'http://127.0.0.1:3100'),
 
     'defaults' => [
         'site.name' => 'Ifeanyi Osiaku',

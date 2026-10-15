@@ -14,7 +14,7 @@ Keep this file current so any session can continue without repeating work.
 ## Next actions
 
 1. CI is green on GitHub; the repository is public. Check https://github.com/engrmarcel/ifeanyiosiaku/actions after each push (run list and annotations are readable without login via the GitHub API).
-2. Milestone 2 in progress (media library → pages/revisions → block registry → homepage sections).
+2. Milestone 2 in progress: steps 1–3 done (media library; pages/blocks/publishing; website rendering). Next: step 4 (portfolio entities + homepage sections) (media library → pages/revisions → block registry → homepage sections).
 
 ## Environment notes (this machine)
 
@@ -25,6 +25,9 @@ Keep this file current so any session can continue without repeating work.
   commands need to run outside the sandbox. If one package keeps failing, pre-fill Composer's cache: download
   the lock file's `dist.url` with system curl to
   `%LOCALAPPDATA%\Composer\files\<vendor>/<package>/<sha1(dist.url)>.zip`, then rerun `composer install`.
+- Editing tip: shell/Node string replacements eat PHP namespace backslashes; use the Edit tool for PHP `use` lines.
+- Visual QA: `scratchpad` CDP scripts (shot.mjs) drive Chrome for real device widths and reduced motion.
+- Local refresh secret: WEB_REVALIDATE_SECRET is set in apps/api/.env and apps/web/.env.local (same value).
 - Tests: Laravel JSON test requests only send cookies after `withCredentials()`; `Tests\TestCase::keepSessionFrom()`
   and `solveCaptcha()` handle this.
 - Next.js 16: read `apps/web/node_modules/next/dist/docs/` before using unfamiliar APIs (Cache Components is on;

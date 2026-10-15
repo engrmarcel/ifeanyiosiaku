@@ -55,13 +55,18 @@ Open **http://localhost:3100**.
 
 > Ports 8000 and 8090–8100 are used by other projects on this computer, which is why this project uses 8110 and 3100.
 
-## 4. Emails during development
+## 4. Publishing and instant updates
+
+When a page is published, Laravel asks the website to refresh it. This needs the **queue window** running and the
+same `WEB_REVALIDATE_SECRET` in `appsapi.env` and `appsweb.env.local`. Without it, changes still appear within an hour.
+
+## 5. Emails during development
 
 `MAIL_MAILER=log`: no real email is sent. Verification and password-reset messages are written to
 `apps\api\storage\logs\laravel-YYYY-MM-DD.log`. Open the newest log file and search for "Confirm email address"
 or "Choose a new password" to find the link. The queue worker window must be running for emails to be produced.
 
-## 5. Demo account (local only)
+## 6. Demo account (local only)
 
 | Email | Password | Role |
 |---|---|---|
@@ -69,7 +74,7 @@ or "Choose a new password" to find the link. The queue worker window must be run
 
 Created by `DevelopmentSeeder`, which refuses to run outside `local`/`testing`.
 
-## 6. Run all automated checks
+## 7. Run all automated checks
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\test.ps1

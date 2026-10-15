@@ -34,6 +34,8 @@
         <env name="CAPTCHA_DIFFICULTY" value="8"/>
         <!-- Tests exercise the production security behaviour (staff must have 2FA). -->
         <env name="REQUIRE_STAFF_TWO_FACTOR" value="true"/>
+        <!-- Never contact a real website from tests; refresh tests set their own fake secret. -->
+        <env name="WEB_REVALIDATE_SECRET" value="" force="true"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

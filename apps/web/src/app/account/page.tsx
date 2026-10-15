@@ -94,6 +94,8 @@ export default function AccountPage() {
         <Card>
           <CardHeader title="Administration" description="Manage the platform." />
           <Button asChild>
+            {/* /admin is served by Laravel through the proxy, so it needs a full page load, not client navigation. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/admin">Open admin panel</a>
           </Button>
         </Card>

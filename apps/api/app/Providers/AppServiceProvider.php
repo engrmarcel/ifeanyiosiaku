@@ -45,9 +45,19 @@ class AppServiceProvider extends ServiceProvider
             return $this->app->isProduction() ? $rule->uncompromised() : $rule;
         });
 
-        RateLimiter::for('api', fn (Request $request) => $request->user()
-            ? Limit::perMinute(120)->by('user:'.$request->user()->getKey())
-            : Limit::perMinute(60)->by('ip:'.$request->ip()));
+        RateLimiter::for('api', function (Request $request) {
+            // The website's own server-side lookups (page data, address checks) arrive from the
+            // website server without a forwarded visitor address. Throttling them per IP would
+            // throttle every visitor at once, so they are not limited here. Visitors' requests
+            // through the proxy carry their real address and keep the normal limits.
+            if (! $request->headers->has('X-Forwarded-For') && in_array($request->ip(), config('app.trusted_proxies'), true)) {
+                return Limit::none();
+            }
+
+            return $request->user()
+                ? Limit::perMinute(120)->by('user:'.$request->user()->getKey())
+                : Limit::perMinute(60)->by('ip:'.$request->ip());
+        });
 
         RateLimiter::for('captcha', fn (Request $request) => Limit::perMinute(20)->by('captcha:'.$request->ip()));
 

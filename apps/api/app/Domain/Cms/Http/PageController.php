@@ -48,6 +48,42 @@ class PageController
         return $payload === null ? $this->notFound($path) : $this->ok($payload);
     }
 
+    /**
+     * Lightweight lookup the website runs before rendering, so it can answer with a real 404 or
+     * 301 status: {status: "page"} | {status: "redirect", to, code} | {status: "missing"}.
+     */
+    public function resolve(Request $request): JsonResponse
+    {
+        $path = '/'.strtolower(trim((string) $request->query('path', ''), '/'));
+
+        if (strlen($path) > 151 || ! preg_match('#^/[a-z0-9\-/]*$#', $path)) {
+            return response()->json(['data' => ['status' => 'missing']]);
+        }
+
+        $result = Cache::remember(PageCache::resolveKey($path), now()->addDay(), function () use ($path) {
+            if ($path === '/') {
+                return ['status' => 'page'];
+            }
+
+            $slug = ltrim($path, '/');
+            $page = Page::query()->where('status', PageStatus::Published)->whereNotNull('published_revision_id')
+                ->whereHas('publishedRevision', fn ($q) => $q->where('slug', $slug))
+                ->first(['id', 'is_homepage']);
+
+            if ($page !== null) {
+                return $page->is_homepage ? ['status' => 'redirect', 'to' => '/', 'code' => 301] : ['status' => 'page'];
+            }
+
+            $redirect = Redirect::query()->where('from_path', $path)->first(['to_path', 'status_code']);
+
+            return $redirect
+                ? ['status' => 'redirect', 'to' => $redirect->to_path, 'code' => $redirect->status_code]
+                : ['status' => 'missing'];
+        });
+
+        return response()->json(['data' => $result]);
+    }
+
     /** Unpublished draft for a signed preview link. Never cached or indexed. */
     public function preview(Request $request, PreviewToken $tokens): JsonResponse
     {

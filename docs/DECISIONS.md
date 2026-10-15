@@ -368,3 +368,32 @@ tested.
 
 **Consequence.** Production deployment must set `APP_ENV=production` (already a launch gate); the deployment
 checklist verifies that `/admin` demands two-factor for staff.
+
+---
+
+## ADR-027 — How CMS pages are served (status codes, caching, instant updates)
+**Status:** Accepted · 2026-10-15
+
+**Context.** Next.js 16 streams pages; once streaming starts the HTTP status cannot change, so a missing page
+would return 200 (with a noindex tag) and a moved page would redirect client-side — both poor for search engines.
+
+**Decision.**
+- **Address check first:** the website's `proxy.ts` asks Laravel `GET /api/v1/page-resolve?path=` (cached, cleared on
+  publish) before rendering any address that could be a CMS page. Moved pages get a real **301**; unknown
+  addresses are rewritten to `/page-not-found`, which returns a real **404** with the styled not-found page. If the
+  API is unreachable the request continues normally.
+- **Rendering:** CMS pages render on the server per request (`instant = false`; homepage uses `connection()`), so
+  builds never depend on the API being reachable. Page data is cached with `"use cache"` + `cacheTag("page:<path>")`
+  (hourly lifetime as a safety net).
+- **Instant updates:** publishing dispatches `RefreshWebsitePaths` (queued, 5 retries) which POSTs the changed paths to
+  `/internal/revalidate` with the shared `WEB_REVALIDATE_SECRET` (≥ 32 chars, constant-time comparison). A refresh
+  failure is logged and never blocks a publish.
+- **Rate limiting:** server-to-server calls from the website (no `X-Forwarded-For`, from a trusted proxy address) are
+  not rate limited; visitor requests through the proxy keep per-visitor limits.
+- **Blocks on the website:** each block's props are validated with Zod; unknown/malformed blocks are skipped and
+  logged. Rich text is inserted only through `SafeHtml` (API-sanitised HTML). Code is highlighted server-side with
+  Shiki (no highlighting JavaScript shipped). Videos load from YouTube (privacy-enhanced domain) or Vimeo only after
+  the visitor presses play.
+- **Animation:** the terminal reveal is pure CSS, always ends visible, and is skipped for reduced motion. The Motion
+  library was removed (no longer used), reducing JavaScript sent to visitors; ADR-019's animation choice is updated
+  accordingly.

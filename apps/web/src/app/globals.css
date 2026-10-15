@@ -94,6 +94,50 @@ body {
   border-radius: 4px;
 }
 
+/* Long-form text from the CMS (sanitised HTML). */
+.io-prose {
+  color: var(--io-text-muted);
+  line-height: 1.75;
+  font-size: 1.0625rem;
+}
+.io-prose > * + * { margin-top: 1.1em; }
+.io-prose h2, .io-prose h3, .io-prose h4 { color: var(--io-text); font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+.io-prose h2 { font-size: 1.75rem; margin-top: 2em; }
+.io-prose h3 { font-size: 1.35rem; margin-top: 1.6em; }
+.io-prose h4 { font-size: 1.1rem; margin-top: 1.4em; }
+.io-prose strong, .io-prose b { color: var(--io-text); font-weight: 600; }
+.io-prose a { color: var(--io-accent); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.io-prose a:hover { text-decoration-thickness: 2px; }
+.io-prose ul, .io-prose ol { padding-left: 1.4em; }
+.io-prose ul { list-style: disc; }
+.io-prose ol { list-style: decimal; }
+.io-prose li + li { margin-top: 0.4em; }
+.io-prose li::marker { color: var(--io-accent); }
+.io-prose blockquote { border-left: 2px solid var(--io-violet); padding-left: 1em; color: var(--io-text); font-style: italic; }
+.io-prose code { font-family: var(--font-mono); font-size: 0.9em; background: var(--io-surface-raised); border: 1px solid var(--io-border); border-radius: 4px; padding: 0.1em 0.35em; color: var(--io-text); }
+.io-prose pre { background: #0d1117; border: 1px solid var(--io-border); border-radius: var(--io-radius); padding: 1em 1.2em; overflow-x: auto; font-size: 0.875rem; }
+.io-prose pre code { background: none; border: 0; padding: 0; }
+.io-prose hr { border-color: var(--io-border); margin: 2em 0; }
+.io-prose table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.io-prose th, .io-prose td { border: 1px solid var(--io-border); padding: 0.5em 0.75em; text-align: left; }
+.io-prose th { color: var(--io-text); background: var(--io-surface-raised); }
+
+/* Shiki code blocks: line numbers and highlighted lines. */
+.io-code { margin: 0; padding: 1rem 0; background: transparent !important; font-family: var(--font-mono); counter-reset: io-line; }
+.io-code code { display: block; min-width: max-content; }
+.io-code .line { display: inline-block; width: 100%; padding: 0 1.25rem; }
+.io-code--numbered .line::before {
+  counter-increment: io-line;
+  content: counter(io-line);
+  display: inline-block;
+  width: 2.5ch;
+  margin-right: 1.25rem;
+  text-align: right;
+  color: rgb(170 180 192 / 0.35);
+  user-select: none;
+}
+.io-code .io-code-line--highlight { background: rgb(163 247 191 / 0.08); box-shadow: inset 2px 0 0 var(--io-accent); }
+
 /* Content protection (ADR-024): no dragging, selecting or iOS long-press saving of media. */
 html.io-protect img,
 html.io-protect video,
@@ -119,6 +163,19 @@ html.io-protect picture {
 
 .io-caret {
   animation: io-caret-blink 1.1s steps(1) infinite;
+}
+
+/* Terminal lines appear one after another. Ends fully visible; no JavaScript needed. */
+@keyframes io-term-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .io-term-animate .io-term-line {
+    animation: io-term-in 0.45s var(--io-ease-out) both;
+    animation-delay: calc(var(--i, 0) * 0.28s + 0.15s);
+  }
 }
 
 /* Respect reduced-motion preferences: stop decorative animation, keep content fully readable. */
