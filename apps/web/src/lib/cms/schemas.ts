@@ -17,6 +17,18 @@ export const mediaSchema = z.object({
 });
 
 const link = z.object({ label: z.string(), url: z.string() });
+const sectionHeader = z.object({ eyebrow: z.string().nullable(), heading: z.string(), intro: z.string().nullable() });
+const skill = z.object({ name: z.string(), description: z.string().nullable() });
+const projectCard = z.object({
+  slug: z.string(),
+  url: z.string(),
+  title: z.string(),
+  summary: z.string().nullable(),
+  role: z.string().nullable(),
+  period: z.string().nullable(),
+  technologies: z.array(z.string()),
+  cover: mediaSchema.nullable(),
+});
 const line = z.object({ kind: z.enum(["command", "output", "highlight", "comment"]), text: z.string() });
 const html = z.string();
 
@@ -96,7 +108,60 @@ export const blockSchemas = {
     secondary: link.nullable(),
   }),
   divider: z.object({ style: z.enum(["line", "space"]), size: z.enum(["sm", "md", "lg"]) }),
+
+  // Data-driven portfolio sections (content comes from the Portfolio admin screens).
+  profile_intro: sectionHeader.extend({
+    name: z.string(),
+    headline: z.string().nullable(),
+    shortBio: z.string().nullable(),
+    bioHtml: z.string(),
+    yearsExperience: z.number().nullable(),
+    portrait: mediaSchema.nullable(),
+  }),
+  expertise: sectionHeader.extend({
+    expertise: z.array(skill),
+    technologies: z.array(skill),
+  }),
+  projects: sectionHeader.extend({ items: z.array(projectCard) }),
+  services: sectionHeader.extend({
+    items: z.array(z.object({ title: z.string(), summary: z.string().nullable(), cta: link.nullable() })),
+  }),
+  experience: sectionHeader.extend({
+    items: z.array(
+      z.object({
+        title: z.string(),
+        organisation: z.string().nullable(),
+        location: z.string().nullable(),
+        period: z.string().nullable(),
+        description: z.string().nullable(),
+      }),
+    ),
+  }),
+  certifications: sectionHeader.extend({
+    items: z.array(
+      z.object({
+        name: z.string(),
+        issuer: z.string().nullable(),
+        issued: z.string().nullable(),
+        url: z.string().nullable(),
+        media: mediaSchema.nullable(),
+      }),
+    ),
+  }),
+  testimonials: sectionHeader.extend({
+    items: z.array(z.object({ quote: z.string(), author: z.string(), title: z.string().nullable(), avatar: mediaSchema.nullable() })),
+  }),
 } as const;
+
+export type ProjectCard = z.infer<typeof projectCard>;
+
+export type ProjectDetail = ProjectCard & {
+  client: string | null;
+  bodyHtml: string;
+  links: { label: string; url: string }[];
+  publishedAt: string | null;
+  updatedAt: string | null;
+};
 
 export type BlockType = keyof typeof blockSchemas;
 export type BlockProps<T extends BlockType> = z.infer<(typeof blockSchemas)[T]>;

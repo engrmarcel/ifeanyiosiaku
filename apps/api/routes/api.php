@@ -4,6 +4,7 @@ use App\Domain\Captcha\Http\CaptchaController;
 use App\Domain\Cms\Http\PageController;
 use App\Domain\Identity\Http\CurrentUserController;
 use App\Domain\Identity\Http\SessionController;
+use App\Domain\Portfolio\Http\ProjectController;
 use App\Domain\Settings\Http\PublicSettingsController;
 use App\Http\Controllers\HealthController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('settings/public', PublicSettingsController::class)->name('settings.public');
 
     Route::get('page-resolve', [PageController::class, 'resolve'])->name('pages.resolve');
+    Route::get('projects/{slug}', [ProjectController::class, 'show'])
+        ->where('slug', '[a-z0-9\-]{1,120}')
+        ->name('projects.show');
     Route::prefix('pages')->name('pages.')->group(function () {
         Route::get('home', [PageController::class, 'home'])->name('home');
         Route::get('{slug}', [PageController::class, 'show'])

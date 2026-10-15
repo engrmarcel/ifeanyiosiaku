@@ -8,6 +8,7 @@ use App\Domain\Cms\Models\Redirect;
 use App\Domain\Cms\PageCache;
 use App\Domain\Cms\PagePresenter;
 use App\Domain\Cms\PreviewToken;
+use App\Domain\Portfolio\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -63,6 +64,13 @@ class PageController
         $result = Cache::remember(PageCache::resolveKey($path), now()->addDay(), function () use ($path) {
             if ($path === '/') {
                 return ['status' => 'page'];
+            }
+
+            // Case studies live at /projects/{slug}.
+            if (preg_match('#^/projects/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)) {
+                return Project::query()->published()->where('slug', $m[1])->exists()
+                    ? ['status' => 'page']
+                    : ['status' => 'missing'];
             }
 
             $slug = ltrim($path, '/');

@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { blockSchemas, type BlockType, type CmsBlock } from "@/lib/cms/schemas";
 import * as B from "./blocks";
+import * as P from "./portfolio";
 
 type Renderer = ComponentType<{ props: never; anchor: string | null; first: boolean }>;
 
@@ -24,6 +25,13 @@ const renderers: Record<BlockType, Renderer> = {
   table: B.TableBlock as Renderer,
   cta: B.CtaBlock as Renderer,
   divider: B.DividerBlock as Renderer,
+  profile_intro: P.ProfileIntroBlock as Renderer,
+  expertise: P.ExpertiseBlock as Renderer,
+  projects: P.ProjectsBlock as Renderer,
+  services: P.ServicesBlock as Renderer,
+  experience: P.ExperienceBlock as Renderer,
+  certifications: P.CertificationsBlock as Renderer,
+  testimonials: P.TestimonialsBlock as Renderer,
 };
 
 export function isKnownBlock(type: string): type is BlockType {

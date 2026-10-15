@@ -25,6 +25,7 @@ enum Permission: string
     /** Trusted HTML/CSS/JS blocks (rendered in a sandboxed frame). Super Administrator only by default. */
     case CmsRawHtml = 'cms.raw_html';
     case MediaManage = 'media.manage';
+    case PortfolioManage = 'portfolio.manage';
 
     /**
      * Default permission bundles per role. Super Administrator receives every permission.
@@ -38,9 +39,9 @@ enum Permission: string
             Role::Admin->value => [
                 self::AdminAccess, self::UsersView, self::UsersManage, self::UsersSuspend,
                 self::SettingsManage, self::AuditLogView, self::SystemHealthView,
-                self::CmsManage, self::CmsPublish, self::MediaManage,
+                self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage,
             ],
-            Role::Editor->value => [self::AdminAccess, self::CmsManage, self::CmsPublish, self::MediaManage],
+            Role::Editor->value => [self::AdminAccess, self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage],
             Role::Instructor->value => [self::AdminAccess, self::MediaManage],
             Role::Moderator->value => [self::AdminAccess, self::UsersView],
             Role::Finance->value => [self::AdminAccess, self::UsersView],

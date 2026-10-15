@@ -92,6 +92,7 @@ apex ifeanyiosiaku.online → 301 → www
 - [ ] Error monitoring receiving events
 - [ ] Legal pages approved by owner (privacy, terms, refunds, reward-credit terms)
 - [ ] Milestone 8 test and security pass complete
+- [ ] Starting content installed once: `php artisan db:seed --class=InitialContentSeeder --force` (safe to re-run; never overwrites edits)
 
 ## 6. Backups (summary — full procedure in BACKUP_AND_RECOVERY.md, M9)
 

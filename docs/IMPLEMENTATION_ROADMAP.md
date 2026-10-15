@@ -105,15 +105,15 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 - [x] Block registry with 19 block types: server-side validation and sanitising, Filament builder (reorder, duplicate, hide, anchors), website renderers with Zod checks, Shiki code highlighting (incl. DAX), click-to-play video, responsive images. **Remaining:** data-driven homepage sections (step 4); download and diagram blocks; raw HTML block (step 8)
 - [x] Code block / terminal panel with Shiki, line numbers, highlights, copy, annotations (verified in Chrome)
 - [ ] Markdown article layout; articles, categories, tags, publications + versions
-- [ ] Portfolio entities: projects, skills, experience (empty), certifications (empty), services, testimonials
+- [x] Portfolio: Profile page (name, headline, bios, years, portrait), projects/case studies (/projects/{slug}), skills & technologies, services, experience (empty), certifications (empty), testimonials (consent required); 7 data-driven blocks; content refreshes the site instantly; media in use is protected
 - [ ] Navigation/header/footer/social config; design token overrides
 - [~] Slugs + automatic redirects; per-page SEO fields (title, description, canonical, noindex, sharing image). **Remaining:** manual redirect admin, sitemap, robots, JSON-LD (step 5)
-- [ ] Homepage composed of configurable section blocks; cinematic hero; terminal/code/particle effects; reduced-motion fallbacks
+- [~] Homepage composed of configurable section blocks (hero with portrait + terminal, about, expertise, work, services, call to action), reduced-motion safe. **Remaining:** subtle code-particle/grid motion effects; sections from later modules (courses, products, articles, events, leaderboard) arrive with those modules
 - [ ] Raw HTML block in sandboxed iframe (Super Admin only)
 - [ ] Announcement popup (global OFF default), analytics events
 - [ ] Contact form (CAPTCHA, rate limit, email notification); newsletter (double opt-in, feature flag)
 - [x] Next.js on-demand revalidation on publish (verified end-to-end: publish visible immediately; renamed page 301; missing page 404 via proxy pre-check, ADR-027)
-- [ ] Seed draft profile content (PRODUCT_REQUIREMENTS §3) — no invented history
+- [x] InitialContentSeeder: approved profile copy, portrait, 9 skills, published homepage; experience/certifications/testimonials left empty (no invented history)
 
 **Acceptance:** Journey F; homepage sections reorder/hide/duplicate from admin; announcement suppressed by global
 switch even when scheduled; Lighthouse/axe report recorded (measured, not assumed).

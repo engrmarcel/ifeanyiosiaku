@@ -3,6 +3,7 @@
 namespace App\Domain\Settings;
 
 use App\Domain\Audit\AuditLogger;
+use App\Domain\Settings\Events\SettingChanged;
 use App\Domain\Settings\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
@@ -47,6 +48,7 @@ class SettingsRepository
         );
 
         Cache::forget(self::CACHE_KEY);
+        SettingChanged::dispatch($key);
 
         $this->audit->record('settings.updated', context: [
             'key' => $key,

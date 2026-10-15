@@ -32,6 +32,27 @@ class Fields
             ->helperText('Upload new images in Content → Media library.');
     }
 
+    /** Same picker, storing the asset's database ID (for models with a media foreign key). */
+    public static function mediaById(string $name, string $label = 'Image'): Select
+    {
+        return Select::make($name)
+            ->label($label)
+            ->searchable()
+            ->getSearchResultsUsing(fn (string $search): array => MediaAsset::query()
+                ->where(fn ($q) => $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('alt_text', 'like', "%{$search}%")
+                    ->orWhere('filename', 'like', "%{$search}%"))
+                ->latest()
+                ->limit(30)
+                ->get()
+                ->mapWithKeys(fn (MediaAsset $m) => [$m->getKey() => self::mediaLabel($m)])
+                ->all())
+            ->getOptionLabelUsing(fn ($value): ?string => ($m = MediaAsset::query()->whereKey($value)->first()) ? self::mediaLabel($m) : null)
+            ->options(fn (): array => MediaAsset::query()->latest()->limit(30)->get()
+                ->mapWithKeys(fn (MediaAsset $m) => [$m->getKey() => self::mediaLabel($m)])->all())
+            ->helperText('Upload new images in Content → Media library.');
+    }
+
     public static function link(string $name, string $label = 'Link'): TextInput
     {
         return TextInput::make($name)

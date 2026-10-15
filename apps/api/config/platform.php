@@ -44,6 +44,14 @@ return [
         // This deters casual copying only; it cannot technically prevent it (see DECISIONS ADR-024).
         'protection.allow_saving_and_inspect' => false,
 
+        // Public profile (approved draft copy, PRODUCT_REQUIREMENTS §3). Editable in Admin → Profile.
+        'profile.name' => 'Ifeanyi Osiaku',
+        'profile.headline' => 'Software Developer | AI Enthusiast | Business Intelligence & Data Analytics Professional',
+        'profile.short_bio' => 'Ifeanyi Osiaku is a technology professional focused on software development, artificial intelligence, business intelligence, data analytics, and data visualization. His work and educational content emphasize turning technical knowledge and complex data into practical solutions to real-world problems.',
+        'profile.bio' => null,
+        'profile.years_experience' => 12,
+        'profile.portrait' => null,
+
         // Add-on modules (ADR-025). All ON by default; administrators can switch each one off.
         'addons.commerce.enabled' => true,
         'addons.learning.enabled' => true,

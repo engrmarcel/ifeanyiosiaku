@@ -74,12 +74,12 @@ erDiagram
 | `navigation_menus` | key (`header/footer/social`), items JSON | |
 | `redirects` | from_path (unique), to_path, status_code, hits, is_automatic, created_by | **implemented M2**; auto-created when a published page changes address; chains collapsed, loops removed |
 | `seo_meta` | seoable_type/id, title, description, canonical_url, robots, og_media_id, schema_type, extra JSON | |
-| `projects` | slug, title, summary, body blocks JSON, role, tech JSON, links JSON, cover_media_id, featured, sort_order, status, published_at | portfolio/case studies |
-| `skills` | name, group, level (optional), icon, sort_order | |
-| `experience_entries` | title, organisation, start_date, end_date, description, sort_order, is_visible | **seeded empty** (no invented history) |
-| `certifications` | name, issuer, issued_on, credential_url, media_id | seeded empty |
-| `services` | slug, title, summary, body, booking_service_id (nullable), product_id (nullable), sort_order | |
-| `testimonials` | author_name, author_title, quote, avatar_media_id, consent_recorded_at, is_visible | only real, consented testimonials |
+| `projects` | ulid, slug, title, summary, body (sanitised HTML), role, client, period, technologies JSON, links JSON, cover_media_id (FK, RESTRICT), is_featured, status, published_at, sort_order, soft deletes | **implemented M2** |
+| `skills` | name, group (`expertise`/`technology`), description, sort_order, is_visible | **implemented M2**; unique (group, name); no invented proficiency levels |
+| `experience_entries` | title, organisation, location, start_date, end_date, is_current, description, sort_order, is_visible | **implemented M2**, seeded empty |
+| `certifications` | name, issuer, issued_on, expires_on, credential_id, credential_url, media_id (FK), sort_order, is_visible | **implemented M2**, seeded empty |
+| `services` | slug, title, summary, body (sanitised HTML), cta_label, cta_url, sort_order, is_visible | **implemented M2**; booking/product links added with those modules |
+| `testimonials` | author_name, author_title, quote, avatar_media_id (FK), consent_confirmed_at, sort_order, is_visible | **implemented M2**; shown only with consent |
 | `articles` | ulid, slug, title, excerpt, body_format (`blocks/markdown`), body, cover_media_id, author_id, status, published_at, is_premium, product_id (nullable), reading_minutes | index (status, published_at); FULLTEXT(title, excerpt) |
 | `content_revisions` | revisionable_type/id, number, payload JSON, created_by | for articles, projects, etc. |
 | `publications` | ulid, slug, title, type (`ebook/research/paper/technical`), abstract, authors JSON, doi/isbn (optional), product_id (nullable), status, published_at | |

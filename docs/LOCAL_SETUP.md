@@ -23,7 +23,7 @@ This is safe to run more than once. It:
 1. Creates the `ifeanyiosiaku` and `ifeanyiosiaku_testing` databases **if they do not already exist** (no other database is touched).
 2. Installs the API and website dependencies.
 3. Creates `apps\api\.env` and `apps\web\.env.local` from the examples if missing.
-4. Applies database migrations and the required seed data (roles, permissions, and a local demo member).
+4. Applies database migrations and seed data: roles and permissions, a local demo member, and the starting content (your profile, portrait, skills and a published homepage).
 
 > **Network note.** On this machine, PHP sometimes cannot reach GitHub/Packagist even when the browser can. If
 > `composer install` fails with "curl error 28" or "Permission denied … tmp-….zip", simply run it again; see
