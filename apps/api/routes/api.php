@@ -3,6 +3,8 @@
 use App\Domain\Captcha\Http\CaptchaController;
 use App\Domain\Cms\Http\PageController;
 use App\Domain\Cms\Http\SitemapController;
+use App\Domain\Content\Http\ArticleController;
+use App\Domain\Content\Http\PublicationController;
 use App\Domain\Identity\Http\CurrentUserController;
 use App\Domain\Identity\Http\SessionController;
 use App\Domain\Portfolio\Http\ProjectController;
@@ -38,6 +40,18 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('preview/page', [PageController::class, 'preview'])
         ->middleware('throttle:30,1')
         ->name('preview.page');
+    Route::get('preview/article', [ArticleController::class, 'preview'])
+        ->middleware('throttle:30,1')
+        ->name('preview.article');
+
+    Route::get('articles', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('articles/{slug}', [ArticleController::class, 'show'])
+        ->where('slug', '[a-z0-9\-]{1,150}')
+        ->name('articles.show');
+    Route::get('publications', [PublicationController::class, 'index'])->name('publications.index');
+    Route::get('publications/{slug}', [PublicationController::class, 'show'])
+        ->where('slug', '[a-z0-9\-]{1,150}')
+        ->name('publications.show');
 
     Route::prefix('captcha')->name('captcha.')->group(function () {
         Route::get('config', [CaptchaController::class, 'config'])->name('config');

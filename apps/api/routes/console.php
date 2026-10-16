@@ -11,6 +11,7 @@ Schedule::call(fn () => Cache::put(HealthController::SCHEDULER_HEARTBEAT_KEY, no
     ->everyMinute();
 
 Schedule::command('cms:publish-scheduled')->everyMinute()->withoutOverlapping();
+Schedule::command('content:announce-scheduled')->everyMinute()->withoutOverlapping();
 Schedule::command('model:prune', ['--model' => [CaptchaChallenge::class]])->hourly();
 Schedule::command('auth:clear-resets')->daily();
 Schedule::command('queue:prune-failed', ['--hours' => 24 * 30])->daily();

@@ -4,6 +4,8 @@ namespace App\Domain\Cms\Http;
 
 use App\Domain\Cms\Enums\PageStatus;
 use App\Domain\Cms\Models\Page;
+use App\Domain\Content\Models\Article;
+use App\Domain\Content\Models\Publication;
 use App\Domain\Portfolio\Models\Project;
 use App\Domain\Settings\SiteConfig;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +44,26 @@ class SitemapController
 
             foreach (Project::query()->published()->orderBy('sort_order')->get(['slug', 'updated_at']) as $project) {
                 $entries[] = ['path' => '/projects/'.$project->slug, 'lastModified' => $project->updated_at?->toIso8601String()];
+            }
+
+            $articles = Article::query()->published()->latest('published_at')->get(['slug', 'seo', 'updated_at']);
+            if ($articles->isNotEmpty()) {
+                $entries[] = ['path' => '/articles', 'lastModified' => $articles->max('updated_at')?->toIso8601String()];
+            }
+            foreach ($articles as $article) {
+                if (! ($article->seo['noindex'] ?? false)) {
+                    $entries[] = ['path' => $article->path(), 'lastModified' => $article->updated_at?->toIso8601String()];
+                }
+            }
+
+            $publications = Publication::query()->published()->orderBy('sort_order')->get(['slug', 'seo', 'updated_at']);
+            if ($publications->isNotEmpty()) {
+                $entries[] = ['path' => '/publications', 'lastModified' => $publications->max('updated_at')?->toIso8601String()];
+            }
+            foreach ($publications as $publication) {
+                if (! ($publication->seo['noindex'] ?? false)) {
+                    $entries[] = ['path' => $publication->path(), 'lastModified' => $publication->updated_at?->toIso8601String()];
+                }
             }
 
             return $entries;

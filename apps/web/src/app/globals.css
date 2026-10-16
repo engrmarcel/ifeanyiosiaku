@@ -122,6 +122,16 @@ body {
 .io-prose th, .io-prose td { border: 1px solid var(--io-border); padding: 0.5em 0.75em; text-align: left; }
 .io-prose th { color: var(--io-text); background: var(--io-surface-raised); }
 
+/* Articles (Markdown): anchors clear the sticky header; wide tables scroll instead of overflowing. */
+.io-prose--article { font-size: 1.0625rem; }
+.io-prose--article h2, .io-prose--article h3, .io-prose--article h4 { scroll-margin-top: 6rem; }
+.io-prose--article > :first-child { margin-top: 0; }
+.io-prose--article img { max-width: 100%; max-height: 32rem; width: auto; height: auto; border-radius: var(--io-radius); border: 1px solid var(--io-border); }
+.io-prose--article table { display: block; overflow-x: auto; }
+.io-prose--article th[align="right"], .io-prose--article td[align="right"] { text-align: right; }
+.io-prose--article th[align="center"], .io-prose--article td[align="center"] { text-align: center; }
+.io-prose del { color: var(--io-text-muted); }
+
 /* Shiki code blocks: line numbers and highlighted lines. */
 .io-code { margin: 0; padding: 1rem 0; background: transparent !important; font-family: var(--font-mono); counter-reset: io-line; }
 .io-code code { display: block; min-width: max-content; }

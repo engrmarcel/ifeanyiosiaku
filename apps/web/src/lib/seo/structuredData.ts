@@ -1,4 +1,5 @@
 import type { ProjectDetail } from "@/lib/cms/schemas";
+import type { Article, Publication } from "@/lib/content/schemas";
 import type { SiteConfig } from "@/lib/site/shared";
 import { SITE_URL, absoluteUrl } from "@/lib/site/url";
 
@@ -70,6 +71,86 @@ export function projectSchema(project: ProjectDetail, site: SiteConfig): Record<
         keywords: project.technologies.length > 0 ? project.technologies.join(", ") : undefined,
         author: { "@id": personId },
       }),
+      personSchema(site),
+    ],
+  };
+}
+
+/** Home › Section › Item trail shown in search results. */
+export function breadcrumbSchema(items: { name: string; path: string }[]): Record<string, unknown> {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
+/** Article page: a technical article by the person, with its breadcrumb trail. */
+export function articleSchema(article: Article, site: SiteConfig): Record<string, unknown> {
+  const url = absoluteUrl(article.url);
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      clean({
+        "@type": "TechArticle",
+        "@id": `${url}#article`,
+        headline: article.title,
+        description: article.seo.description ?? article.excerpt ?? undefined,
+        url,
+        mainEntityOfPage: url,
+        image: imageUrl(article.seo.image ?? article.cover),
+        datePublished: article.publishedAt ?? undefined,
+        dateModified: article.updatedAt ?? article.publishedAt ?? undefined,
+        timeRequired: `PT${article.readingMinutes}M`,
+        articleSection: article.categories[0]?.name,
+        keywords: article.tags.length > 0 ? article.tags.map((t) => t.name).join(", ") : undefined,
+        author: { "@id": personId },
+        publisher: { "@id": personId },
+      }),
+      breadcrumbSchema([
+        { name: "Home", path: "/" },
+        { name: "Articles", path: "/articles" },
+        { name: article.title, path: article.url },
+      ]),
+      personSchema(site),
+    ],
+  };
+}
+
+/** Publication page: a book, paper or report, with identifiers when known. */
+export function publicationSchema(publication: Publication, site: SiteConfig): Record<string, unknown> {
+  const url = absoluteUrl(publication.url);
+  const type = publication.type === "ebook" ? "Book" : publication.type === "technical" ? "Report" : "ScholarlyArticle";
+  const latest = publication.versions[0];
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      clean({
+        "@type": type,
+        "@id": `${url}#publication`,
+        name: publication.title,
+        headline: type === "ScholarlyArticle" ? publication.title : undefined,
+        description: publication.seo.description ?? publication.summary ?? undefined,
+        url,
+        image: imageUrl(publication.cover),
+        datePublished: publication.publishedAt ?? undefined,
+        dateModified: publication.updatedAt ?? undefined,
+        version: latest?.label,
+        isbn: type === "Book" ? (publication.isbn ?? undefined) : undefined,
+        sameAs: publication.doi ? [`https://doi.org/${publication.doi}`] : undefined,
+        author: publication.authors.length > 0 ? publication.authors.map((name) => ({ "@type": "Person", name })) : { "@id": personId },
+      }),
+      breadcrumbSchema([
+        { name: "Home", path: "/" },
+        { name: "Publications", path: "/publications" },
+        { name: publication.title, path: publication.url },
+      ]),
       personSchema(site),
     ],
   };

@@ -14,7 +14,7 @@ Keep this file current so any session can continue without repeating work.
 ## Next actions
 
 1. CI is green on GitHub; the repository is public. Check https://github.com/engrmarcel/ifeanyiosiaku/actions after each push (run list and annotations are readable without login via the GitHub API).
-2. Milestone 2 in progress: steps 1–5 done (media library; pages/blocks/publishing; website rendering; portfolio + homepage; navigation/footer/appearance, redirects, sitemap/robots/JSON-LD). Next: step 6 (articles, categories, tags, publications + versions; Markdown article layout).
+2. Milestone 2 in progress: steps 1–6 done (media library; pages/blocks/publishing; website rendering; portfolio + homepage; navigation/footer/appearance, redirects, sitemap/robots/JSON-LD; articles, publications, PDF uploads, share bar). Next: step 7 (announcement popup, contact form, newsletter).
 
 ## Environment notes (this machine)
 

@@ -12,6 +12,7 @@
         "laravel/fortify": "^1.41",
         "laravel/framework": "^13.36",
         "laravel/tinker": "^3.0",
+        "league/commonmark": "^2.10.3",
         "spatie/laravel-permission": "^8.3"
     },
     "require-dev": {

@@ -7,6 +7,9 @@ use App\Domain\Cms\Enums\PageStatus;
 use App\Domain\Cms\Events\PageContentChanged;
 use App\Domain\Cms\Models\Page;
 use App\Domain\Cms\Models\Redirect;
+use App\Domain\Content\Models\Article;
+use App\Domain\Content\Models\Publication;
+use App\Domain\Portfolio\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -72,9 +75,24 @@ class SaveRedirect
             $this->fail('from_path', 'Use an address on this site such as /old-page (letters, numbers, hyphens and slashes).');
         }
 
-        $segment = explode('/', ltrim($from, '/'))[0];
-        if (in_array($segment, [...config('cms.reserved_slugs', []), ...self::WEBSITE_ROUTES], true)) {
+        $segments = explode('/', ltrim($from, '/'));
+        $sections = config('cms.content_sections', []);
+        $isSectionItem = count($segments) === 2 && in_array($segments[0], $sections, true);
+
+        if (! $isSectionItem && in_array($segments[0], [...config('cms.reserved_slugs', []), ...self::WEBSITE_ROUTES], true)) {
             $this->fail('from_path', 'This address belongs to the website itself and cannot be redirected.');
+        }
+
+        if ($isSectionItem) {
+            $model = match ($segments[0]) {
+                'articles' => Article::class,
+                'publications' => Publication::class,
+                default => Project::class,
+            };
+
+            if ($model::query()->published()->where('slug', $segments[1])->exists()) {
+                $this->fail('from_path', 'Published content lives at this address, so a redirect would never be used.');
+            }
         }
 
         $taken = Redirect::query()->where('from_path', $from)

@@ -3,6 +3,7 @@
 use App\Domain\Cms\Actions\DeleteRedirect;
 use App\Domain\Cms\Actions\SaveRedirect;
 use App\Domain\Cms\Models\Redirect;
+use App\Domain\Content\Models\Article;
 use App\Domain\Identity\Enums\Role;
 use App\Filament\Resources\Redirects\Pages\ManageRedirects;
 use Filament\Actions\Testing\TestAction;
@@ -72,6 +73,20 @@ it('redirects old case-study addresses once the project is gone', function () {
     saveRedirect(['from_path' => '/projects/old-dashboard', 'to_path' => '/projects/sales-dashboard']);
 
     resolvePath('/projects/old-dashboard')->assertJsonPath('data.status', 'redirect');
+});
+
+it('allows redirects from old article addresses but not from live content or section lists', function () {
+    Article::query()->create([
+        'slug' => 'live-article', 'title' => 'Live', 'body' => 'x', 'status' => 'published', 'published_at' => now()->subDay(),
+    ]);
+
+    saveRedirect(['from_path' => '/articles/old-article', 'to_path' => '/articles/live-article']);
+    resolvePath('/articles/old-article')->assertJsonPath('data.to', '/articles/live-article');
+
+    expect(redirectErrors(['from_path' => '/articles/live-article', 'to_path' => '/x']))->toHaveKey('from_path')
+        ->and(redirectErrors(['from_path' => '/articles', 'to_path' => '/x']))->toHaveKey('from_path')
+        ->and(redirectErrors(['from_path' => '/publications', 'to_path' => '/x']))->toHaveKey('from_path')
+        ->and(redirectErrors(['from_path' => '/articles/a/b', 'to_path' => '/x']))->toHaveKey('from_path');
 });
 
 it('records changes in the audit log and clears the address cache', function () {

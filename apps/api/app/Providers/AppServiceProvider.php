@@ -6,6 +6,7 @@ use App\Domain\Cms\Blocks\BlockRegistry;
 use App\Domain\Cms\Events\PageContentChanged;
 use App\Domain\Cms\LivePaths;
 use App\Domain\Cms\PageCache;
+use App\Domain\Content\Blocks\ArticlesBlock;
 use App\Domain\Identity\Listeners\AuthEventSubscriber;
 use App\Domain\Notifications\Listeners\RecordNotificationDelivery;
 use App\Domain\Portfolio\Blocks\PortfolioBlocks;
@@ -30,7 +31,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(BlockRegistry::class);
-        $this->app->afterResolving(BlockRegistry::class, fn (BlockRegistry $registry) => PortfolioBlocks::register($registry));
+        $this->app->afterResolving(BlockRegistry::class, function (BlockRegistry $registry) {
+            PortfolioBlocks::register($registry);
+            $registry->register(ArticlesBlock::class);
+        });
     }
 
     /**

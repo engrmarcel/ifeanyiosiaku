@@ -3,11 +3,11 @@
 namespace App\Domain\Cms\Actions;
 
 use App\Domain\Audit\AuditLogger;
+use App\Domain\Cms\AutomaticRedirects;
 use App\Domain\Cms\Blocks\BlockRegistry;
 use App\Domain\Cms\Enums\PageStatus;
 use App\Domain\Cms\Events\PageContentChanged;
 use App\Domain\Cms\Models\Page;
-use App\Domain\Cms\Models\Redirect;
 use App\Domain\Media\MediaUsageRecorder;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -49,13 +49,7 @@ class PublishPage
 
             if ($previous && $previous->slug !== $page->slug && ! $page->is_homepage) {
                 $from = '/'.$previous->slug;
-                $to = '/'.$page->slug;
-                Redirect::query()->where('from_path', $to)->delete(); // avoid loops
-                Redirect::query()->updateOrCreate(['from_path' => $from], [
-                    'to_path' => $to, 'status_code' => 301, 'is_automatic' => true, 'created_by' => $actor?->getKey(),
-                ]);
-                // Earlier automatic redirects pointing at the old address now jump straight to the new one.
-                Redirect::query()->where('to_path', $from)->update(['to_path' => $to]);
+                AutomaticRedirects::moved($from, '/'.$page->slug, $actor?->getKey());
                 $paths[] = $from;
             } elseif ($previousPath !== null) {
                 $paths[] = $previousPath;

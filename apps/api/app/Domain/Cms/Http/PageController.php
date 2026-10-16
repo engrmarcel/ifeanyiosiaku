@@ -8,6 +8,8 @@ use App\Domain\Cms\Models\Redirect;
 use App\Domain\Cms\PageCache;
 use App\Domain\Cms\PagePresenter;
 use App\Domain\Cms\PreviewToken;
+use App\Domain\Content\Models\Article;
+use App\Domain\Content\Models\Publication;
 use App\Domain\Portfolio\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -66,10 +68,22 @@ class PageController
                 return ['status' => 'page'];
             }
 
-            // Case studies live at /projects/{slug}.
-            if (preg_match('#^/projects/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)
-                && Project::query()->published()->where('slug', $m[1])->exists()) {
+            // Article and publication lists are website pages of their own.
+            if ($path === '/articles' || $path === '/publications') {
                 return ['status' => 'page'];
+            }
+
+            // Case studies, articles and publications live at /{section}/{slug}.
+            if (preg_match('#^/(projects|articles|publications)/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)) {
+                $model = match ($m[1]) {
+                    'projects' => Project::class,
+                    'articles' => Article::class,
+                    default => Publication::class,
+                };
+
+                if ($model::query()->published()->where('slug', $m[2])->exists()) {
+                    return ['status' => 'page'];
+                }
             }
 
             $slug = ltrim($path, '/');

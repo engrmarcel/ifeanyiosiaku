@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { mediaSchema } from "@/lib/cms/schemas";
+import { mediaSchema } from "@/lib/cms/media";
 
 /** Site configuration types and defaults, safe to use in browser components. */
 

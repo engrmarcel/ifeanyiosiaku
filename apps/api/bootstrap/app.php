@@ -39,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands([
         __DIR__.'/../app/Domain/Cms/Console',
+        __DIR__.'/../app/Domain/Content/Console',
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);

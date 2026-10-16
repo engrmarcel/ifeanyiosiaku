@@ -65,7 +65,7 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `media_assets` | ulid, disk (`media` public / private later), directory, filename, original_name, mime, size, width, height, title, alt_text, description, checksum_sha256 (duplicate detection), uploaded_by | **implemented M2**; index (mime), index (checksum_sha256) |
+| `media_assets` | ulid, disk (`media` public / private later), directory, filename, original_name, mime, size, width, height, title, alt_text, description, checksum_sha256 (duplicate detection), uploaded_by | **implemented M2** (images, and public PDFs since step 6); index (mime), index (checksum_sha256) |
 | `media_variants` | media_asset_id, variant (`sm` 320 / `md` 768 / `lg` 1280 / `xl` 1920, WebP), filename, mime, width, height, size | **implemented M2**; unique (asset, variant); cascade with asset |
 | `media_usages` | media_asset_id, usable_type, usable_id, field | **implemented M2**; RESTRICT delete of in-use assets; unique per (asset, usable, field) |
 | `pages` | ulid, working draft (title, slug unique, template, blocks JSON, seo JSON), is_homepage (exactly one, enforced in SetHomepage), status (`draft/scheduled/published/archived`), published_revision_id, published_at, publish_at, unpublish_at, created_by, updated_by, soft deletes | **implemented M2**; visitors only ever see the published revision |
@@ -80,12 +80,12 @@ erDiagram
 | `certifications` | name, issuer, issued_on, expires_on, credential_id, credential_url, media_id (FK), sort_order, is_visible | **implemented M2**, seeded empty |
 | `services` | slug, title, summary, body (sanitised HTML), cta_label, cta_url, sort_order, is_visible | **implemented M2**; booking/product links added with those modules |
 | `testimonials` | author_name, author_title, quote, avatar_media_id (FK), consent_confirmed_at, sort_order, is_visible | **implemented M2**; shown only with consent |
-| `articles` | ulid, slug, title, excerpt, body_format (`blocks/markdown`), body, cover_media_id, author_id, status, published_at, is_premium, product_id (nullable), reading_minutes | index (status, published_at); FULLTEXT(title, excerpt) |
-| `content_revisions` | revisionable_type/id, number, payload JSON, created_by | for articles, projects, etc. |
-| `publications` | ulid, slug, title, type (`ebook/research/paper/technical`), abstract, authors JSON, doi/isbn (optional), product_id (nullable), status, published_at | |
-| `publication_versions` | publication_id, version_label, changelog, file_media_id, released_at | |
-| `categories` | type (`article/product/course/community/event`), parent_id, name, slug | unique (type, slug) |
-| `tags` | name, slug (unique) | |
+| `articles` | ulid, slug (unique), title, excerpt, body (Markdown), cover_media_id (FK, RESTRICT), author_id, status, published_at (future = scheduled), reading_minutes, seo JSON, updated_by, soft deletes | **implemented M2**; index (status, published_at). Search uses LIKE for now (FULLTEXT is not visible inside test transactions; revisit when volume grows). Premium articles (is_premium, product_id) arrive with Commerce |
+| `content_revisions` | revisionable_type/id, number, payload JSON (incl. category/tag ids), note, created_by, created_at | **implemented M2** for articles; latest 50 kept |
+| `publications` | ulid, slug (unique), title, type (`ebook/research/paper/technical`), abstract, authors JSON, doi, isbn, cover_media_id, status, published_at, sort_order, seo JSON, soft deletes | **implemented M2** (free only; product_id with Commerce) |
+| `publication_versions` | publication_id, version_label (unique per publication), changelog, file_media_id (PDF, RESTRICT), external_url (https), released_at | **implemented M2**; a file or a link is required |
+| `categories` | type (`article/product/course/community/event`), parent_id, name, slug, description, sort_order | unique (type, slug); **implemented M2** (type `article`) |
+| `tags` | name, slug (unique) | **implemented M2**; `categorizables`/`taggables` polymorphic pivots |
 | `categorizables`, `taggables` | polymorphic pivots | |
 
 ### 2.3 Commerce and payments

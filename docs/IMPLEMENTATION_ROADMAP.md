@@ -104,7 +104,8 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 - [x] Pages + immutable revisions + draft/preview/publish/schedule + restore (API side; admin editor with Save draft / Preview / Publish / Unpublish / Make homepage / trash; version history with restore; automatic redirects on address change; signed 15-minute preview links; scheduled publish/unpublish job)
 - [x] Block registry with 19 block types: server-side validation and sanitising, Filament builder (reorder, duplicate, hide, anchors), website renderers with Zod checks, Shiki code highlighting (incl. DAX), click-to-play video, responsive images. **Remaining:** data-driven homepage sections (step 4); download and diagram blocks; raw HTML block (step 8)
 - [x] Code block / terminal panel with Shiki, line numbers, highlights, copy, annotations (verified in Chrome)
-- [ ] Markdown article layout; articles, categories, tags, publications + versions
+- [x] Articles in Markdown (contents list, reading time, server-side code highlighting, images from the media library only, raw HTML removed), categories, tags, list with filters/search/pages, draft → preview → publish/schedule, version history with restore, automatic redirects on address change, "Latest articles" homepage section; publications (eBook/research/paper/technical) with versions (PDF and/or link), DOI/ISBN; PDF uploads in the media library (active content refused, always downloaded) — ADR-029
+- [x] Share bar (LinkedIn, X, Facebook, WhatsApp, Telegram, email, copy link, device share sheet) on article and publication pages; plain links, no third-party scripts — ADR-029
 - [x] Portfolio: Profile page (name, headline, bios, years, portrait), projects/case studies (/projects/{slug}), skills & technologies, services, experience (empty), certifications (empty), testimonials (consent required); 7 data-driven blocks; content refreshes the site instantly; media in use is protected
 - [x] Navigation/header/footer/social config (admin screen; phone menu; add-on-aware links); accent colour presets applied as design tokens (contrast-tested) — ADR-028
 - [x] Slugs + automatic and manual redirects (loop/chain protection, visit counts, https destinations); per-page SEO fields; sitemap.xml, robots.txt, search-engine indexing switch, JSON-LD (Person, WebSite, CreativeWork) — ADR-028
@@ -120,7 +121,7 @@ switch even when scheduled; Lighthouse/axe report recorded (measured, not assume
 
 ### Milestone 3 — Commerce
 - [ ] Gate every route, page and admin screen behind the `commerce` add-on (ADR-025)
-- [ ] Products, prices, files, versions, categories/tags, bundles, licences, search/filter, related
+- [ ] Products, prices, files, versions, categories/tags, bundles, licences, search/filter, related; product pages use the shared ShareBar (ADR-029)
 - [ ] Cart (guest + user, merge on login), checkout with server-side pricing, coupons
 - [ ] Orders + state machine + audit; order expiry job
 - [ ] PaymentGateway contract; Paystack adapter; Flutterwave adapter; FakeGateway (tests)
@@ -138,7 +139,7 @@ signature, amount mismatch, concurrent confirmations, unentitled download denied
 
 ### Milestone 4 — Learning
 - [ ] Gate behind the `learning` add-on; free courses keep working when `commerce` is off (ADR-025)
-- [ ] Courses, modules, lessons, resources, previews, drip, cohorts, bundles (via commerce)
+- [ ] Courses, modules, lessons, resources, previews, drip, cohorts, bundles (via commerce); course pages use the shared ShareBar (ADR-029)
 - [ ] VideoProvider contract + Bunny Stream adapter + local dev adapter; signed playback
 - [ ] Enrolment on purchase or free enrol; learner dashboard; lesson player; resume; progress
 - [ ] Quizzes (server-side grading), assignments (submission + grading)
@@ -149,7 +150,7 @@ signature, amount mismatch, concurrent confirmations, unentitled download denied
 leaked before submission.
 
 ### Milestone 5 — Events, challenges, appointments
-- [ ] Events, sessions, ticket types (capacity-safe), registration, waitlist, cancellation policy
+- [ ] Events, sessions, ticket types (capacity-safe), registration, waitlist, cancellation policy; event pages use the shared ShareBar (ADR-029)
 - [ ] Meeting link release to ticket holders only; reminders; .ics export; check-in; attendance; certificates
 - [ ] Challenges: statements, windows, submissions, judges, scoring, rankings, awards
 - [ ] Booking services, availability rules/exceptions, slot generation (time zones, buffers, notice, window)

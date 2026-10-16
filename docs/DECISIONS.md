@@ -430,3 +430,40 @@ broken or unsafe links.
   escaped so content cannot break out of the script tag (tested).
 - **Social links are shown as text labels**, not brand logos, matching the terminal style and avoiding inaccurate
   hand-drawn logos.
+
+## ADR-029 — Articles, publications, documents and sharing
+**Status:** Accepted · 2026-10-16
+
+**Context.** The owner writes technical content (code, data, dashboards) and publishes papers and eBooks with new
+editions over time. Visitors should be able to share any of it easily.
+
+**Decision.**
+- **Articles are written in Markdown** (REQ-CMS-7), not page blocks: it suits code-heavy writing. The API renders
+  Markdown with league/commonmark (now a declared dependency, ^2.10.3; versions with known advisories are
+  ≤ 2.10.1), with raw HTML **stripped**, unsafe links dropped, and the result sanitised again with an allow-list.
+  Top-level code blocks are sent separately and highlighted on the website by Shiki (never executed). `#` headings
+  become section headings (the title is the page's only h1) and form the contents list. Images must come from the
+  media library; any other image is replaced by its description, so articles cannot load trackers.
+- **Publishing:** draft → signed preview link → published; a future publish time schedules it.
+  `content:announce-scheduled` (every minute) tells the website when scheduled articles, publications **and
+  projects** go live. That last case was a gap from step 4: future-dated projects would not appear until the
+  hourly cache expired. Unlike pages, saving a published article updates the live site directly. Every save is kept
+  (latest 50 versions) and any version can be restored; restoring never unpublishes. Without the publish permission
+  a writer can create drafts but cannot publish or change live articles.
+- **Addresses:** `/articles/{slug}`, `/publications/{slug}`. Renaming live content leaves a 301 from the old
+  address (shared `AutomaticRedirects`, also used by pages). Pages cannot use `articles`/`publications` as their
+  first segment; manual redirects may start from old item addresses in those sections.
+- **Categories and tags** are shared tables with a `type` on categories (articles now; store, courses and events
+  later). Search uses simple text matching for now (see DATABASE_DESIGN).
+- **Publications** have versions; each needs a PDF from the media library and/or an https link (e.g. DOI page).
+  Paid publications will be sold through the store (Milestone 3, private files).
+- **PDFs in the media library:** signature and real type checked; files containing scripts, launch actions,
+  embedded files, rich media or XFA forms are refused, including inside compressed streams and hex-escaped names
+  (an ordinary "open at page 1" action is allowed). PDFs are always served as downloads with the sandbox CSP. They
+  are stored unchanged, so document properties (author, software) remain; the upload screen says so. Image fields
+  never show a document, even if one was stored by mistake.
+- **Sharing:** one shared `ShareBar` (LinkedIn, X, Facebook, WhatsApp, Telegram, email, copy link, and the
+  device's own share sheet where available) on article and publication pages, hidden in previews. Plain links to
+  each network's share page, so **no third-party scripts, cookies or tracking** load on the site. Icons use the
+  official simple-icons shapes (CC0); LinkedIn withdrew its logo from that set, so a simple "in" mark is drawn.
+  Event, course and store item pages will use the same component when those modules are built (roadmap M3–M5).

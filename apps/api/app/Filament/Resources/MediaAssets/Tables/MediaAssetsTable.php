@@ -19,15 +19,16 @@ class MediaAssetsTable
             ->defaultSort('created_at', 'desc')
             ->columns([
                 ImageColumn::make('preview')
-                    ->getStateUsing(fn (MediaAsset $record): string => $record->url('sm'))
+                    ->getStateUsing(fn (MediaAsset $record): ?string => $record->isImage() ? $record->url('sm') : null)
                     ->imageHeight(56),
                 TextColumn::make('title')->searchable()->placeholder('Untitled')->description(fn (MediaAsset $record) => $record->filename),
                 TextColumn::make('alt_text')
                     ->label('Alt text')
                     ->limit(40)
                     ->placeholder('Missing — please add')
-                    ->color(fn (MediaAsset $record) => $record->alt_text ? null : 'warning'),
-                TextColumn::make('dimensions')->getStateUsing(fn (MediaAsset $record) => "{$record->width} × {$record->height}"),
+                    ->color(fn (MediaAsset $record) => $record->alt_text || ! $record->isImage() ? null : 'warning')
+                    ->getStateUsing(fn (MediaAsset $record): ?string => $record->isImage() ? $record->alt_text : '— (document)'),
+                TextColumn::make('dimensions')->label('Type')->getStateUsing(fn (MediaAsset $record) => $record->isImage() ? "{$record->width} × {$record->height}" : 'PDF'),
                 TextColumn::make('size')->formatStateUsing(fn (int $state) => number_format($state / 1024, 0).' KB')->sortable(),
                 TextColumn::make('usages_count')->label('Used in')->badge()->sortable(),
                 TextColumn::make('created_at')->label('Uploaded')->since()->sortable(),

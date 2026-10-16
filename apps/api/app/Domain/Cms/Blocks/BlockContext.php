@@ -32,7 +32,10 @@ class BlockContext
             return null;
         }
 
-        return $this->media->get($ulid)?->toPublicArray();
+        $asset = $this->media->get($ulid);
+
+        // Image slots only ever show images, even if a document's ID was stored by mistake.
+        return $asset !== null && $asset->isImage() ? $asset->toPublicArray() : null;
     }
 
     public function html(?string $html): string

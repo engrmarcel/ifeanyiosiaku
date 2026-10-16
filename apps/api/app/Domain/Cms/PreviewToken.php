@@ -3,25 +3,30 @@
 namespace App\Domain\Cms;
 
 use App\Domain\Cms\Models\Page;
+use App\Domain\Content\Models\Article;
 
 /**
- * Short-lived signed link that shows a page's unpublished draft. Anyone holding the link can view
- * that one draft until it expires (15 minutes by default); it grants nothing else.
+ * Short-lived signed link that shows one unpublished draft (a page or an article). Anyone holding
+ * the link can view that one draft until it expires (15 minutes by default); it grants nothing else.
  */
 class PreviewToken
 {
+    public const PAGE = 'page';
+
+    public const ARTICLE = 'article';
+
     public function issue(Page $page): string
     {
-        $payload = $this->encode((string) json_encode([
-            'p' => $page->ulid,
-            'e' => now()->addMinutes((int) config('cms.preview_ttl_minutes', 15))->getTimestamp(),
-        ]));
-
-        return $payload.'.'.$this->sign($payload);
+        return $this->issueFor(self::PAGE, $page->ulid);
     }
 
-    /** Returns the page ULID for a valid, unexpired token. */
-    public function verify(?string $token): ?string
+    public function issueForArticle(Article $article): string
+    {
+        return $this->issueFor(self::ARTICLE, $article->ulid);
+    }
+
+    /** Returns the ULID for a valid, unexpired token of the given kind. */
+    public function verify(?string $token, string $kind = self::PAGE): ?string
     {
         if (! is_string($token) || substr_count($token, '.') !== 1 || strlen($token) > 400) {
             return null;
@@ -39,7 +44,23 @@ class PreviewToken
             return null;
         }
 
+        // Links issued before articles existed carry no kind and are page links.
+        if (($data['k'] ?? self::PAGE) !== $kind) {
+            return null;
+        }
+
         return $data['p'];
+    }
+
+    private function issueFor(string $kind, string $ulid): string
+    {
+        $payload = $this->encode((string) json_encode([
+            'k' => $kind,
+            'p' => $ulid,
+            'e' => now()->addMinutes((int) config('cms.preview_ttl_minutes', 15))->getTimestamp(),
+        ]));
+
+        return $payload.'.'.$this->sign($payload);
     }
 
     private function sign(string $payload): string

@@ -5,12 +5,6 @@ use App\Domain\Cms\Actions\SavePageDraft;
 use App\Domain\Cms\Models\Page;
 use App\Domain\Settings\SettingsRepository;
 
-function sitemapPaths(): array
-{
-    return collect(test()->withHeaders(test()->apiHeaders())->getJson('/api/v1/sitemap')->assertOk()->json('data.entries'))
-        ->pluck('path')->all();
-}
-
 it('lists published, indexable pages and case studies', function () {
     livePage('about');
     app(PublishPage::class)->handle(app(SavePageDraft::class)->handle(new Page, [

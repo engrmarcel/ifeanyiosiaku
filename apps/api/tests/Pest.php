@@ -54,3 +54,9 @@ function project(array $overrides = []): Project
         ...$overrides,
     ]);
 }
+
+function sitemapPaths(): array
+{
+    return collect(test()->withHeaders(test()->apiHeaders())->getJson('/api/v1/sitemap')->assertOk()->json('data.entries'))
+        ->pluck('path')->all();
+}

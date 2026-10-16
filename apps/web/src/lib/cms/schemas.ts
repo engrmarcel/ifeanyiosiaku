@@ -1,20 +1,13 @@
 import { z } from "zod";
+import { articleCardSchema } from "@/lib/content/schemas";
+import { mediaSchema } from "./media";
 
 /**
  * Website-side schemas for CMS block props (ADR-007). The API already validates and sanitises
  * content; these guard the renderer so a malformed block is skipped instead of breaking the page.
  */
 
-export const mediaSchema = z.object({
-  id: z.string(),
-  url: z.string(),
-  mime: z.string(),
-  width: z.number().nullable(),
-  height: z.number().nullable(),
-  alt: z.string(),
-  title: z.string().nullable(),
-  variants: z.array(z.object({ name: z.string(), url: z.string(), width: z.number(), height: z.number(), mime: z.string() })),
-});
+export { mediaSchema };
 
 const link = z.object({ label: z.string(), url: z.string() });
 const sectionHeader = z.object({ eyebrow: z.string().nullable(), heading: z.string(), intro: z.string().nullable() });
@@ -148,6 +141,7 @@ export const blockSchemas = {
       }),
     ),
   }),
+  articles: sectionHeader.extend({ items: z.array(articleCardSchema), allUrl: z.string().nullable() }),
   testimonials: sectionHeader.extend({
     items: z.array(z.object({ quote: z.string(), author: z.string(), title: z.string().nullable(), avatar: mediaSchema.nullable() })),
   }),

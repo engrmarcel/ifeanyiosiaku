@@ -18,11 +18,19 @@ class MediaFileController
         $disk = Storage::disk('media');
         abort_unless($disk->exists($path), 404);
 
-        return response()->file($disk->path($path), [
+        $headers = [
             'Cache-Control' => 'public, max-age=31536000, immutable',
             'X-Content-Type-Options' => 'nosniff',
             // Even if a file were crafted to look like HTML, it could not run scripts.
             'Content-Security-Policy' => "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox",
-        ]);
+        ];
+
+        // Documents are always downloaded, never opened inside the website.
+        if (strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'pdf') {
+            $headers['Content-Type'] = 'application/pdf';
+            $headers['Content-Disposition'] = 'attachment; filename="'.basename($path).'"';
+        }
+
+        return response()->file($disk->path($path), $headers);
     }
 }
