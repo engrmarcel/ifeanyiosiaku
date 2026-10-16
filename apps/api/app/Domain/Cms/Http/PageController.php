@@ -8,9 +8,12 @@ use App\Domain\Cms\Models\Redirect;
 use App\Domain\Cms\PageCache;
 use App\Domain\Cms\PagePresenter;
 use App\Domain\Cms\PreviewToken;
+use App\Domain\Commerce\Models\Product;
 use App\Domain\Content\Models\Article;
 use App\Domain\Content\Models\Publication;
 use App\Domain\Portfolio\Models\Project;
+use App\Domain\Settings\Addons;
+use App\Domain\Settings\Enums\Addon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -63,21 +66,28 @@ class PageController
             return response()->json(['data' => ['status' => 'missing']]);
         }
 
+        // A switched-off store does not exist (ADR-025). Checked before the cache, so switching the
+        // add-on off takes effect immediately.
+        if (($path === '/store' || str_starts_with($path, '/store/')) && ! app(Addons::class)->enabled(Addon::Commerce)) {
+            return response()->json(['data' => ['status' => 'missing']]);
+        }
+
         $result = Cache::remember(PageCache::resolveKey($path), now()->addDay(), function () use ($path) {
             if ($path === '/') {
                 return ['status' => 'page'];
             }
 
-            // Article and publication lists are website pages of their own.
-            if ($path === '/articles' || $path === '/publications') {
+            // Article, publication and store lists are website pages of their own.
+            if (in_array($path, ['/articles', '/publications', '/store'], true)) {
                 return ['status' => 'page'];
             }
 
-            // Case studies, articles and publications live at /{section}/{slug}.
-            if (preg_match('#^/(projects|articles|publications)/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)) {
+            // Case studies, articles, publications and products live at /{section}/{slug}.
+            if (preg_match('#^/(projects|articles|publications|store)/([a-z0-9]+(?:-[a-z0-9]+)*)$#', $path, $m)) {
                 $model = match ($m[1]) {
                     'projects' => Project::class,
                     'articles' => Article::class,
+                    'store' => Product::class,
                     default => Publication::class,
                 };
 

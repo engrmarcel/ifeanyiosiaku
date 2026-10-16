@@ -120,8 +120,8 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 switch even when scheduled; Lighthouse/axe report recorded (measured, not assumed).
 
 ### Milestone 3 — Commerce
-- [ ] Gate every route, page and admin screen behind the `commerce` add-on (ADR-025)
-- [ ] Products, prices, files, versions, categories/tags, bundles, licences, search/filter, related; product pages use the shared ShareBar (ADR-029)
+- [~] Gate every route, page and admin screen behind the `commerce` add-on (ADR-025) — catalogue API, `/store` pages, address lookup, sitemap and store admin screens done (step 1); cart/checkout/orders follow the same rule
+- [x] Products (downloadable types; courses/tickets/appointments/premium articles become products via their modules), per-currency prices in minor units, private files, versions, store categories, tags, bundles, licence terms, free products, free samples, search/filter, related, ShareBar, Product JSON-LD — ADR-032
 - [ ] Cart (guest + user, merge on login), checkout with server-side pricing, coupons
 - [ ] Orders + state machine + audit; order expiry job
 - [ ] PaymentGateway contract; Paystack adapter; Flutterwave adapter; FakeGateway (tests)

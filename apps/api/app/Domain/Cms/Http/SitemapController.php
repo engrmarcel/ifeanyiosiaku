@@ -4,9 +4,12 @@ namespace App\Domain\Cms\Http;
 
 use App\Domain\Cms\Enums\PageStatus;
 use App\Domain\Cms\Models\Page;
+use App\Domain\Commerce\Models\Product;
 use App\Domain\Content\Models\Article;
 use App\Domain\Content\Models\Publication;
 use App\Domain\Portfolio\Models\Project;
+use App\Domain\Settings\Addons;
+use App\Domain\Settings\Enums\Addon;
 use App\Domain\Settings\SiteConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -63,6 +66,19 @@ class SitemapController
             foreach ($publications as $publication) {
                 if (! ($publication->seo['noindex'] ?? false)) {
                     $entries[] = ['path' => $publication->path(), 'lastModified' => $publication->updated_at?->toIso8601String()];
+                }
+            }
+
+            // Store products, only while the Commerce add-on is on (the cache is cleared when it changes).
+            if (app(Addons::class)->enabled(Addon::Commerce)) {
+                $products = Product::query()->published()->orderByDesc('is_featured')->orderBy('sort_order')->get(['slug', 'seo', 'updated_at']);
+                if ($products->isNotEmpty()) {
+                    $entries[] = ['path' => '/store', 'lastModified' => $products->max('updated_at')?->toIso8601String()];
+                }
+                foreach ($products as $product) {
+                    if (! ($product->seo['noindex'] ?? false)) {
+                        $entries[] = ['path' => $product->path(), 'lastModified' => $product->updated_at?->toIso8601String()];
+                    }
                 }
             }
 

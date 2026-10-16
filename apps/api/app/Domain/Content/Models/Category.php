@@ -2,6 +2,7 @@
 
 namespace App\Domain\Content\Models;
 
+use App\Domain\Commerce\Models\Product;
 use App\Domain\Content\ContentObserver;
 use App\Policies\ContentPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
- * A category for one kind of content (only "article" so far; products, courses and events add theirs).
+ * A category for one kind of content (articles and store products so far; courses and events add theirs).
  *
  * @property string $type
  * @property int|null $parent_id
@@ -25,6 +26,8 @@ class Category extends Model
 {
     public const TYPE_ARTICLE = 'article';
 
+    public const TYPE_PRODUCT = 'product';
+
     protected $guarded = ['id'];
 
     /** @var array<string, mixed> */
@@ -34,6 +37,12 @@ class Category extends Model
     public function articles(): MorphToMany
     {
         return $this->morphedByMany(Article::class, 'categorizable');
+    }
+
+    /** @return MorphToMany<Product, $this> */
+    public function products(): MorphToMany
+    {
+        return $this->morphedByMany(Product::class, 'categorizable');
     }
 
     /** @return array{slug: string, name: string} */

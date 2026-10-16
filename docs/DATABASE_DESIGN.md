@@ -110,12 +110,12 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `products` | ulid, type (`ebook/pdf/research/publication/template/code_package/asset/premium_article/course/event_ticket/appointment/bundle/custom`), slug (unique), title, description, status, is_free, sellable_type/sellable_id (course, ticket type, booking service), licence_terms, coin_redeemable (bool), max_coin_ratio_bp (basis points, nullable) | index (type, status) |
-| `product_prices` | product_id, currency, amount, compare_at_amount, active_from, active_to | unique (product_id, currency, active_from) |
-| `product_files` | product_id, product_version_id, media_asset_id (private disk), label, download_limit | |
-| `product_versions` | product_id, version_label, changelog, released_at | buyers keep access to purchased version per licence |
-| `bundle_items` | bundle_product_id, product_id | |
-| `product_licences` | product_id, name, terms, seats | optional |
+| `products` | ulid, type (`ebook/pdf/research/publication/template/code_package/asset/premium_article/course/event_ticket/appointment/bundle/custom`), slug (unique), title, summary, description (sanitised HTML), cover_media_id, preview_media_id (free sample), status, published_at, is_free, is_featured, sellable_type/sellable_id (course, ticket type, booking service), licence_terms, coin_redeemable (bool), max_coin_ratio_bp (basis points, nullable), seo JSON, sort_order, soft deletes | **implemented M3 step 1**; index (type, status), (status, published_at) |
+| `product_prices` | product_id, currency, amount (minor units), compare_at_amount | **implemented M3**; unique (product_id, currency). Price history is preserved on order items (snapshot), so dated price rows are not needed yet |
+| `product_files` | ulid, product_id (RESTRICT), product_version_id, label, disk (`products`, private), path (random name), original_name, mime, size, checksum_sha256, download_limit, sort_order, uploaded_by | **implemented M3**; never publicly reachable |
+| `product_versions` | product_id, version_label (unique per product), changelog, released_at | **implemented M3** |
+| `bundle_items` | bundle_product_id, product_id (RESTRICT), sort_order | **implemented M3** |
+| `product_licences` | product_id, name, terms, seats | optional — not built; licence terms are a text field on the product for now |
 | `carts` / `cart_items` | user_id or guest token, product_id, quantity, currency | prices **not trusted** from cart — recomputed at checkout |
 | `coupons` | code (unique, case-insensitive), type (`percent/fixed`), value, currency, max_uses, max_uses_per_user, starts_at, ends_at, applies_to JSON, min_subtotal | |
 | `coupon_redemptions` | coupon_id, order_id (unique pair), user_id | |

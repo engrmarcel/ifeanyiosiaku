@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Domain\Captcha\CaptchaManager;
+use App\Domain\Commerce\Money;
 use App\Domain\Identity\Enums\Permission;
 use App\Domain\Identity\Enums\Role;
 use App\Domain\Settings\Enums\Addon;
@@ -10,6 +11,7 @@ use App\Domain\Settings\SettingsRepository;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -41,6 +43,8 @@ class SiteSettings extends Page
         'contact.recipient_email' => 'email',
         'newsletter.enabled' => 'bool',
         'newsletter.consent_text' => 'text',
+        'commerce.currencies' => 'currencies',
+        'commerce.download_limit' => 'int',
         'announcements.enabled' => 'bool',
         'seo.allow_indexing' => 'bool',
         'security.require_staff_two_factor' => 'bool',
@@ -108,6 +112,20 @@ class SiteSettings extends Page
                     ->schema([
                         Toggle::make(self::field('registration.enabled'))
                             ->label('Allow new members to register'),
+                    ]),
+                Section::make('Store')
+                    ->description('Applies while the Digital store add-on is on.')
+                    ->columns(2)
+                    ->schema([
+                        CheckboxList::make(self::field('commerce.currencies'))
+                            ->label('Sell in these currencies')
+                            ->options(Money::SUPPORTED)
+                            ->required()
+                            ->helperText('The first ticked currency is the default. Each product needs a price in every currency you sell in, or it shows as unavailable in that currency.'),
+                        TextInput::make(self::field('commerce.download_limit'))
+                            ->label('Downloads allowed per file per buyer')
+                            ->numeric()->minValue(1)->maxValue(1000)->required()
+                            ->helperText('Individual files can set their own limit.'),
                     ]),
                 Section::make('Contact form')
                     ->schema([
@@ -194,6 +212,15 @@ class SiteSettings extends Page
 
             if ($type === 'bool') {
                 $value = (bool) $state[self::field($key)];
+            } elseif ($type === 'currencies') {
+                // Keep the supported ones, NGN first when ticked (it is the primary currency).
+                $picked = array_values(array_intersect(array_keys(Money::SUPPORTED), (array) $state[self::field($key)]));
+                if ($picked === []) {
+                    continue;
+                }
+                $value = $picked;
+            } elseif ($type === 'int') {
+                $value = max(1, min(1000, (int) $state[self::field($key)]));
             } elseif ($type === 'email' || $type === 'text') {
                 $value = trim((string) $state[self::field($key)]);
                 $value = $value === '' ? null : $value;

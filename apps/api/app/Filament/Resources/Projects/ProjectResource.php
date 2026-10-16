@@ -99,7 +99,7 @@ class ProjectResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $q) => $q->with('cover.variants'))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('cover.variants'))
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
             ->columns([

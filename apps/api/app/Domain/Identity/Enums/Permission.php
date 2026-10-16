@@ -32,6 +32,9 @@ enum Permission: string
     /** Newsletter subscriber list and export. */
     case NewsletterManage = 'newsletter.manage';
 
+    /** Store catalogue: products, prices, files, coupons. */
+    case CommerceManage = 'commerce.manage';
+
     /**
      * Default permission bundles per role. Super Administrator receives every permission.
      *
@@ -45,7 +48,7 @@ enum Permission: string
                 self::AdminAccess, self::UsersView, self::UsersManage, self::UsersSuspend,
                 self::SettingsManage, self::AuditLogView, self::SystemHealthView,
                 self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage,
-                self::ContactManage, self::NewsletterManage,
+                self::ContactManage, self::NewsletterManage, self::CommerceManage,
             ],
             Role::Editor->value => [self::AdminAccess, self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage],
             Role::Instructor->value => [self::AdminAccess, self::MediaManage],

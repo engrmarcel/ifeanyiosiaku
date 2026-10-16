@@ -2,6 +2,7 @@
 
 namespace App\Domain\Content\Models;
 
+use App\Domain\Commerce\Models\Product;
 use App\Domain\Content\ContentObserver;
 use App\Policies\ContentPolicy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -23,6 +24,12 @@ class Tag extends Model
     public function articles(): MorphToMany
     {
         return $this->morphedByMany(Article::class, 'taggable');
+    }
+
+    /** @return MorphToMany<Product, $this> */
+    public function products(): MorphToMany
+    {
+        return $this->morphedByMany(Product::class, 'taggable');
     }
 
     /** @return array{slug: string, name: string} */

@@ -75,6 +75,11 @@ return [
         'profile.years_experience' => 12,
         'profile.portrait' => null,
 
+        // Store (Milestone 3). Prices are entered per currency; NGN is primary (Q4). Add 'USD' to sell in dollars too.
+        'commerce.currencies' => ['NGN'],
+        // How many times a buyer may download each file, unless a file sets its own limit.
+        'commerce.download_limit' => 5,
+
         // Add-on modules (ADR-025). All ON by default; administrators can switch each one off.
         'addons.commerce.enabled' => true,
         'addons.learning.enabled' => true,
@@ -91,6 +96,7 @@ return [
         'registration.enabled',
         'newsletter.enabled',
         'newsletter.consent_text',
+        'commerce.currencies',
         'protection.allow_saving_and_inspect',
         'addons.commerce.enabled',
         'addons.learning.enabled',

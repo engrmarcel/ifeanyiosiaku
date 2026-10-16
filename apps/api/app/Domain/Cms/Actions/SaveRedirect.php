@@ -7,6 +7,7 @@ use App\Domain\Cms\Enums\PageStatus;
 use App\Domain\Cms\Events\PageContentChanged;
 use App\Domain\Cms\Models\Page;
 use App\Domain\Cms\Models\Redirect;
+use App\Domain\Commerce\Models\Product;
 use App\Domain\Content\Models\Article;
 use App\Domain\Content\Models\Publication;
 use App\Domain\Portfolio\Models\Project;
@@ -87,6 +88,7 @@ class SaveRedirect
             $model = match ($segments[0]) {
                 'articles' => Article::class,
                 'publications' => Publication::class,
+                'store' => Product::class,
                 default => Project::class,
             };
 

@@ -5,6 +5,7 @@ use App\Domain\Captcha\Http\CaptchaController;
 use App\Domain\Cms\Http\EmbedController;
 use App\Domain\Cms\Http\PageController;
 use App\Domain\Cms\Http\SitemapController;
+use App\Domain\Commerce\Http\StoreController;
 use App\Domain\Contact\Http\ContactController;
 use App\Domain\Content\Http\ArticleController;
 use App\Domain\Content\Http\PublicationController;
@@ -57,6 +58,14 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('articles/{slug}', [ArticleController::class, 'show'])
         ->where('slug', '[a-z0-9\-]{1,150}')
         ->name('articles.show');
+    // Store (Milestone 3): behind the Commerce add-on switch (ADR-025).
+    Route::prefix('store')->name('store.')->middleware('addon:commerce')->group(function () {
+        Route::get('products', [StoreController::class, 'index'])->name('products.index');
+        Route::get('products/{slug}', [StoreController::class, 'show'])
+            ->where('slug', '[a-z0-9\-]{1,150}')
+            ->name('products.show');
+    });
+
     Route::get('publications', [PublicationController::class, 'index'])->name('publications.index');
     Route::get('publications/{slug}', [PublicationController::class, 'show'])
         ->where('slug', '[a-z0-9\-]{1,150}')

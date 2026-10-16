@@ -1,4 +1,5 @@
 import type { ProjectDetail } from "@/lib/cms/schemas";
+import type { Product as StoreProduct } from "@/lib/commerce/schemas";
 import type { Article, Publication } from "@/lib/content/schemas";
 import type { SiteConfig } from "@/lib/site/shared";
 import { SITE_URL, absoluteUrl } from "@/lib/site/url";
@@ -150,6 +151,45 @@ export function publicationSchema(publication: Publication, site: SiteConfig): R
         { name: "Home", path: "/" },
         { name: "Publications", path: "/publications" },
         { name: publication.title, path: publication.url },
+      ]),
+      personSchema(site),
+    ],
+  };
+}
+
+/** Store product: name, image, price and availability (only when it can actually be bought). */
+export function productSchema(product: StoreProduct, site: SiteConfig): Record<string, unknown> {
+  const url = absoluteUrl(product.url);
+  const offer =
+    product.isFree || product.price
+      ? clean({
+          "@type": "Offer",
+          url,
+          price: product.isFree ? "0" : (product.price!.amount / 100).toFixed(2),
+          priceCurrency: product.isFree ? product.currency : product.price!.currency,
+          availability: "https://schema.org/InStock",
+          seller: { "@id": personId },
+        })
+      : undefined;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      clean({
+        "@type": "Product",
+        "@id": `${url}#product`,
+        name: product.title,
+        description: product.seo.description ?? product.summary ?? undefined,
+        url,
+        image: imageUrl(product.cover),
+        category: product.typeLabel,
+        brand: { "@id": personId },
+        offers: offer,
+      }),
+      breadcrumbSchema([
+        { name: "Home", path: "/" },
+        { name: "Store", path: "/store" },
+        { name: product.title, path: product.url },
       ]),
       personSchema(site),
     ],

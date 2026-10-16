@@ -49,6 +49,16 @@ return [
             'report' => false,
         ],
 
+        // Paid product files. Never publicly reachable: downloads are streamed only after an
+        // entitlement check, through short-lived signed links (ADR-010). Production: private bucket.
+        'products' => [
+            'driver' => 'local',
+            'root' => storage_path('app/products'),
+            'visibility' => 'private',
+            'throw' => true,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

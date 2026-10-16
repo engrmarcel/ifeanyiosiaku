@@ -97,6 +97,9 @@ apex ifeanyiosiaku.online → 301 → www
 - [ ] Scheduler runs `content:announce-scheduled` every minute (scheduled articles, publications and projects appear on time)
 - [ ] After each deploy: `php artisan db:seed --class=RolesAndPermissionsSeeder --force` (adds new permissions such as contact.manage and newsletter.manage)
 - [ ] Site settings: contact-form recipient email set; newsletter sign-up switched on **only** after transactional email is configured and tested
+- [ ] PHP `intl` extension enabled (money formatting, e.g. ₦12,500.00)
+- [ ] Private `products` storage (paid files) is outside the web root, never served by Nginx, included in backups; production uses a private S3-compatible bucket (ADR-010)
+- [ ] PHP `upload_max_filesize` / `post_max_size` and Nginx `client_max_body_size` allow product uploads (up to 512 MB)
 - [ ] Starting content installed once: `php artisan db:seed --class=InitialContentSeeder --force` (safe to re-run; never overwrites edits; creates the homepage and the /contact page if missing)
 
 ## 6. Backups (summary — full procedure in BACKUP_AND_RECOVERY.md, M9)

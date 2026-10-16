@@ -542,3 +542,36 @@ acceptance requires measured Lighthouse/axe results.
   - The code font is not preloaded, giving the hero image priority.
   - The header no longer ships the validation library to browsers.
 - **Hero motion:** CSS-only grid drift and floating code glyphs, on large screens only, disabled for reduced motion.
+
+## ADR-032 — Store catalogue
+**Status:** Accepted · 2026-10-16
+
+**Context.** Milestone 3 starts with what the store sells: digital products with exact prices, files that only
+buyers may download, and a catalogue that can be switched off entirely (ADR-025).
+
+**Decision.**
+- **Products.** Editors create the downloadable kinds directly: eBook, PDF, research, publication, template, code
+  package, digital asset, bundle and custom. Courses, event tickets, appointments and premium articles become
+  products through their own modules later, linked via `sellable_type/sellable_id`.
+- **Visibility.** A product is visible when published and its publish time has passed; a future time schedules
+  it. Renaming a live product redirects its old address.
+- **Prices** are per currency, stored as integer minor units (ADR-005).
+  - Editors type amounts such as `12,500.50`. Amounts with more decimals than the currency allows are
+    refused, never rounded.
+  - Display uses `intl` (₦12,500.50). Store currencies are a setting (NGN default; USD can be ticked).
+  - A product without a price in the chosen currency shows as unavailable in it.
+  - Free products have no prices. Carts never hold trusted prices; checkout will recompute (step 2).
+- **Files** live on a private `products` disk, under random names in a folder per product. They have no public
+  address: the API only exposes labels, sizes and extensions.
+  - Uploads are limited to an allow-list of extensions, up to 512 MB.
+  - Size, type and SHA-256 fingerprint are recorded from the stored file itself.
+  - Deleting a file record deletes its bytes.
+  - Downloads will be streamed only to entitled buyers through short-lived signed links (step 4).
+- **Store categories** are separate from article categories (the `categories.type = product` admin screen);
+  tags are shared.
+- **Add-on switch.** With Commerce off, the API answers 404, the address lookup reports `/store` pages missing
+  (checked before the day-long cache, so it takes effect immediately), the sitemap drops products, and the
+  Store admin screens are hidden and forbidden.
+- **Admin screen check.** A test now opens every admin list and create screen. It found a latent crash in the
+  Projects list from Milestone 2: Filament passes table and relationship query callbacks by parameter name, so
+  the parameter must be called `$query`.
