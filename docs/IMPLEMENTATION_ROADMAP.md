@@ -120,10 +120,10 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 switch even when scheduled; Lighthouse/axe report recorded (measured, not assumed).
 
 ### Milestone 3 — Commerce
-- [~] Gate every route, page and admin screen behind the `commerce` add-on (ADR-025) — catalogue API, `/store` pages, address lookup, sitemap and store admin screens done (step 1); cart/checkout/orders follow the same rule
+- [~] Gate every route, page and admin screen behind the `commerce` add-on (ADR-025) — catalogue API, `/store` pages, address lookup, sitemap and store admin screens (step 1); cart, checkout, orders, `/cart`, `/checkout`, `/account/orders` and the Orders/Coupons admin screens (step 2)
 - [x] Products (downloadable types; courses/tickets/appointments/premium articles become products via their modules), per-currency prices in minor units, private files, versions, store categories, tags, bundles, licence terms, free products, free samples, search/filter, related, ShareBar, Product JSON-LD — ADR-032
-- [ ] Cart (guest + user, merge on login), checkout with server-side pricing, coupons
-- [ ] Orders + state machine + audit; order expiry job
+- [x] Cart (guest cookie + account, merge on sign-in), checkout with server-side pricing, coupons (percent/fixed, product-specific, minimum spend, total and per-customer limits) — ADR-033
+- [x] Orders + state machine + audit; order expiry job (`commerce:expire-orders`, every 5 minutes) — ADR-033. Customers can see and cancel their own orders; paid orders cannot be paid for online until step 3
 - [ ] PaymentGateway contract; Paystack adapter; Flutterwave adapter; FakeGateway (tests)
 - [ ] Webhook endpoint + `webhook_events` idempotency + queued processing + verify-call
 - [ ] Entitlements; fulfilment on `OrderPaid`; receipts (numbered) + email

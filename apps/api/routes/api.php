@@ -5,6 +5,8 @@ use App\Domain\Captcha\Http\CaptchaController;
 use App\Domain\Cms\Http\EmbedController;
 use App\Domain\Cms\Http\PageController;
 use App\Domain\Cms\Http\SitemapController;
+use App\Domain\Commerce\Http\CartController;
+use App\Domain\Commerce\Http\OrderController;
 use App\Domain\Commerce\Http\StoreController;
 use App\Domain\Contact\Http\ContactController;
 use App\Domain\Content\Http\ArticleController;
@@ -44,14 +46,14 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             ->name('show');
     });
     Route::get('preview/page', [PageController::class, 'preview'])
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:preview')
         ->name('preview.page');
     Route::get('embeds/{token}', [EmbedController::class, 'show'])
         ->where('token', '[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+')
-        ->middleware('throttle:120,1')
+        ->middleware('throttle:embeds')
         ->name('embeds.show');
     Route::get('preview/article', [ArticleController::class, 'preview'])
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:preview')
         ->name('preview.article');
 
     Route::get('articles', [ArticleController::class, 'index'])->name('articles.index');
@@ -64,6 +66,24 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('products/{slug}', [StoreController::class, 'show'])
             ->where('slug', '[a-z0-9\-]{1,150}')
             ->name('products.show');
+
+        // Cart: visitors and members. Prices are recalculated on every response.
+        Route::prefix('cart')->name('cart.')->middleware('throttle:cart')->group(function () {
+            Route::get('/', [CartController::class, 'show'])->name('show');
+            Route::post('items', [CartController::class, 'add'])->name('items.add');
+            Route::delete('items/{product}', [CartController::class, 'remove'])->where('product', '[0-9a-z]{26}')->name('items.remove');
+            Route::post('coupon', [CartController::class, 'applyCoupon'])->middleware('throttle:coupon')->name('coupon.apply');
+            Route::delete('coupon', [CartController::class, 'removeCoupon'])->name('coupon.remove');
+            Route::put('currency', [CartController::class, 'currency'])->name('currency');
+        });
+
+        // Checkout and order history: signed-in members only.
+        Route::middleware('auth')->group(function () {
+            Route::post('checkout', [OrderController::class, 'store'])->middleware('throttle:checkout')->name('checkout');
+            Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{order}', [OrderController::class, 'show'])->where('order', '[0-9a-z]{26}')->name('orders.show');
+            Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->where('order', '[0-9a-z]{26}')->name('orders.cancel');
+        });
     });
 
     Route::get('publications', [PublicationController::class, 'index'])->name('publications.index');
@@ -85,8 +105,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('subscribe', [NewsletterController::class, 'subscribe'])
             ->middleware(['throttle:newsletter', 'captcha:newsletter'])
             ->name('subscribe');
-        Route::post('confirm', [NewsletterController::class, 'confirm'])->middleware('throttle:20,1')->name('confirm');
-        Route::post('unsubscribe', [NewsletterController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('unsubscribe');
+        Route::post('confirm', [NewsletterController::class, 'confirm'])->middleware('throttle:newsletter-links')->name('confirm');
+        Route::post('unsubscribe', [NewsletterController::class, 'unsubscribe'])->middleware('throttle:newsletter-links')->name('unsubscribe');
     });
 
     Route::prefix('captcha')->name('captcha.')->group(function () {
@@ -102,7 +122,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::prefix('account/sessions')->name('account.sessions.')->group(function () {
             Route::get('/', [SessionController::class, 'index'])->name('index');
             Route::post('revoke-others', [SessionController::class, 'destroyOthers'])
-                ->middleware('throttle:6,1')
+                ->middleware('throttle:sessions')
                 ->name('revoke-others');
             Route::delete('{session}', [SessionController::class, 'destroy'])
                 ->where('session', '[a-f0-9]{32}')

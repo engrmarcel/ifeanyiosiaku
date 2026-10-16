@@ -79,13 +79,19 @@ export default function AccountPage() {
               title={commerce && learning ? "Learning & purchases" : learning ? "Learning" : "Purchases"}
               description={
                 commerce && learning
-                  ? "Your courses, downloads and orders will appear here."
+                  ? "Your orders are listed here; courses and downloads arrive in upcoming releases."
                   : learning
                     ? "Your courses and progress will appear here."
-                    : "Your downloads and orders will appear here."
+                    : "Your orders, and soon your downloads."
               }
             />
-            <EmptyState title="Nothing yet" description="These features arrive in upcoming releases." />
+            {commerce ? (
+              <Button asChild variant="secondary">
+                <Link href="/account/orders">View your orders</Link>
+              </Button>
+            ) : (
+              <EmptyState title="Nothing yet" description="These features arrive in upcoming releases." />
+            )}
           </Card>
         )}
       </div>

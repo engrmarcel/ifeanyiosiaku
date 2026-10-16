@@ -575,3 +575,35 @@ buyers may download, and a catalogue that can be switched off entirely (ADR-025)
 - **Admin screen check.** A test now opens every admin list and create screen. It found a latent crash in the
   Projects list from Milestone 2: Filament passes table and relationship query callbacks by parameter name, so
   the parameter must be called `$query`.
+
+## ADR-033 — Cart, checkout, coupons and orders
+**Status:** Accepted · 2026-10-16
+
+**Context.** Milestone 3 step 2 turns the catalogue into orders. Prices must come only from the server, coupon
+limits must hold when people check out at the same moment, and the order record must survive later changes to
+products.
+
+**Decision.**
+- **Cart.** Visitors get a cart linked to a random cookie (`io_cart`, 30 days, HttpOnly); only a SHA-256 hash of it
+  is stored. Members have one cart in their account. Signing in moves the visitor's items (and code) into the
+  account cart. Digital products are added once each. Nothing in a cart is a price: every cart answer is
+  recalculated from current prices, availability and coupon rules.
+- **Coupons.** Percentage (whole 1–100, rounded down to the minor unit) or fixed amount in one currency, shared
+  across eligible items in proportion to their price (rounding leftovers to the last item, never below zero).
+  Optional: specific products, minimum spend, valid-from/until, total uses, uses per customer. Codes are matched
+  case-insensitively. A code the cart cannot use is refused with a plain reason and not kept.
+- **Checkout** needs a signed-in member with a confirmed email (receipts and downloads go there). In one
+  database transaction it locks the cart and the coupon, recalculates everything, refuses withdrawn products or a
+  code that has run out, and writes the order with a snapshot of each product. Amounts sent by the browser are
+  ignored. An order costing nothing (free products or a 100% code) is marked paid straight away.
+- **Orders** follow a fixed state machine: awaiting payment → paid, cancelled or expired; paid → refunded or
+  partly refunded. Every change locks the row and is audit-logged, so two confirmations cannot both succeed.
+  Unpaid orders expire after 60 minutes (setting `commerce.order_expiry_minutes`); cancelling or expiring frees
+  the coupon use. Orders are never deleted. Customers see only their own orders (others' answer "not found").
+- **Admin.** Finance and Admin can view orders; only Admin (`orders.manage`) can cancel an unpaid one. Coupons are
+  managed by store managers. Everything stays behind the Commerce add-on switch.
+- **Payment is not connected yet.** Paid orders are placed and wait for payment; the order page says plainly that
+  online payment is not available yet. Payment providers arrive in step 3.
+- **Rate limits.** Each limit now has its own name. Unnamed limits (`throttle:10,1`) share one counter per person
+  in Laravel, so ordinary cart use was eating into the coupon limit; the same applied to previews, embeds,
+  newsletter links and session revocation, which are now separate too.

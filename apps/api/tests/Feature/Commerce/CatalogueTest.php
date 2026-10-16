@@ -15,25 +15,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
-function product(array $overrides = [], ?int $ngn = 1_250_000): Product
-{
-    $product = Product::query()->create([
-        'type' => ProductType::Ebook,
-        'slug' => 'dax-handbook',
-        'title' => 'The DAX Handbook',
-        'summary' => 'Practical DAX patterns.',
-        'status' => Product::STATUS_PUBLISHED,
-        'published_at' => now()->subDay(),
-        ...$overrides,
-    ]);
-
-    if ($ngn !== null && ! $product->is_free) {
-        $product->prices()->create(['currency' => 'NGN', 'amount' => $ngn]);
-    }
-
-    return $product;
-}
-
 function storeApi(string $path = '')
 {
     return test()->withHeaders(test()->apiHeaders())->getJson('/api/v1/store/products'.$path);

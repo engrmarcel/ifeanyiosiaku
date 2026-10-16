@@ -3,6 +3,8 @@
 use App\Domain\Cms\Actions\PublishPage;
 use App\Domain\Cms\Actions\SavePageDraft;
 use App\Domain\Cms\Models\Page;
+use App\Domain\Commerce\Enums\ProductType;
+use App\Domain\Commerce\Models\Product;
 use App\Domain\Identity\Enums\Role;
 use App\Domain\Portfolio\Models\Project;
 use App\Models\User;
@@ -54,6 +56,26 @@ function project(array $overrides = []): Project
         'is_featured' => true,
         ...$overrides,
     ]);
+}
+
+/** A published store product, priced in NGN unless $ngn is null (amount in kobo). */
+function product(array $overrides = [], ?int $ngn = 1_250_000): Product
+{
+    $product = Product::query()->create([
+        'type' => ProductType::Ebook,
+        'slug' => 'dax-handbook',
+        'title' => 'The DAX Handbook',
+        'summary' => 'Practical DAX patterns.',
+        'status' => Product::STATUS_PUBLISHED,
+        'published_at' => now()->subDay(),
+        ...$overrides,
+    ]);
+
+    if ($ngn !== null && ! $product->is_free) {
+        $product->prices()->create(['currency' => 'NGN', 'amount' => $ngn]);
+    }
+
+    return $product;
 }
 
 function sitemapPaths(): array

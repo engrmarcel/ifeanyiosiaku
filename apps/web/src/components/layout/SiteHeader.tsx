@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { CartLink } from "@/components/commerce/CartLink";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { cn } from "@/lib/cn";
@@ -53,6 +54,7 @@ export function SiteHeader({ name, links }: SiteHeaderProps) {
         )}
 
         <div className="flex items-center gap-2">
+          <CartLink />
           <nav aria-label="Account" className="flex items-center gap-2">
             {status === "loading" ? (
               <span className="h-8 w-20" aria-hidden="true" />

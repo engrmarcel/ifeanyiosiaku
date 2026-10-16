@@ -7,6 +7,8 @@ import { SiteHeader } from "./SiteHeader";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/services" }));
 vi.mock("@/lib/auth/AuthProvider", () => ({ useAuth: () => ({ user: null, status: "guest" }) }));
+vi.mock("@/lib/settings/SiteSettingsProvider", () => ({ useAddon: () => true }));
+vi.mock("@/lib/commerce/CartProvider", () => ({ useCart: () => ({ cart: { count: 2 } }) }));
 
 const links = [
   { label: "Work", url: "/#work", newTab: false },
@@ -25,6 +27,7 @@ describe("SiteHeader", () => {
     expect(blog).toHaveAttribute("href", "https://blog.example");
     expect(blog).toHaveAttribute("target", "_blank");
     expect(blog).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.getByRole("link", { name: "Cart, 2 items" })).toHaveAttribute("href", "/cart");
   });
 
   it("toggles the phone menu and closes it with Escape", () => {

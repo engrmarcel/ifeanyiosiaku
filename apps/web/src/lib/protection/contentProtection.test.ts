@@ -35,6 +35,10 @@ describe("isBlockedShortcut", () => {
   ])("allows %s", (_, event) => {
     expect(isBlockedShortcut(event)).toBe(false);
   });
+
+  it("ignores the key-less keydown events sent by browser autofill", () => {
+    expect(isBlockedShortcut({ ...key("x"), key: undefined as unknown as string })).toBe(false);
+  });
 });
 
 describe("installContentProtection", () => {

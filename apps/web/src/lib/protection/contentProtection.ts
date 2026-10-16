@@ -21,6 +21,8 @@ type KeyLike = Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "shiftKey" | 
  * F12 · Ctrl+Shift+I/J/C/K · Ctrl+U · Ctrl+S · ⌘⌥I/J/C · ⌘⌥U · ⌘U · ⌘S
  */
 export function isBlockedShortcut(event: KeyLike): boolean {
+  // Browser autofill sends keydown events without a key; those are never shortcuts.
+  if (typeof event.key !== "string") return false;
   const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
 
   if (key === "F12") return true;

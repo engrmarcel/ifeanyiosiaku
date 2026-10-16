@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MediaImage } from "@/components/blocks/MediaImage";
 import { SafeHtml } from "@/components/blocks/SafeHtml";
+import { AddToCartButton } from "@/components/commerce/AddToCartButton";
 import { PriceTag } from "@/components/commerce/PriceTag";
 import { ProductCard } from "@/components/commerce/ProductCard";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -96,6 +97,8 @@ export default async function ProductPage({ params, searchParams }: PageProps<"/
               ))}
             </p>
           )}
+
+          <AddToCartButton product={product} className="mt-6" />
 
           <ShareBar path={product.url} title={product.title} className="mt-8" />
 

@@ -6,6 +6,7 @@ use App\Domain\Cms\Blocks\BlockRegistry;
 use App\Domain\Cms\Events\PageContentChanged;
 use App\Domain\Cms\LivePaths;
 use App\Domain\Cms\PageCache;
+use App\Domain\Commerce\Cart\MergeGuestCartOnLogin;
 use App\Domain\Contact\Blocks\ContactFormBlock;
 use App\Domain\Content\Blocks\ArticlesBlock;
 use App\Domain\Identity\Listeners\AuthEventSubscriber;
@@ -14,6 +15,7 @@ use App\Domain\Notifications\Listeners\RecordNotificationDelivery;
 use App\Domain\Portfolio\Blocks\PortfolioBlocks;
 use App\Domain\Settings\Events\SettingChanged;
 use App\Domain\Settings\SiteConfig;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Middleware\TrustProxies;
@@ -86,10 +88,18 @@ class AppServiceProvider extends ServiceProvider
         ]);
         RateLimiter::for('announcement-events', fn (Request $request) => Limit::perMinute(30)->by('announcement:'.$request->ip()));
 
+        // Simple per-minute limits. Each has its own name because unnamed limits ("throttle:10,1")
+        // all share one counter per person, so busy use of one feature would block another.
+        $who = fn (Request $request): string => $request->user() ? 'user:'.$request->user()->getAuthIdentifier() : 'ip:'.$request->ip();
+        foreach (['preview' => 30, 'embeds' => 120, 'newsletter-links' => 20, 'sessions' => 6, 'cart' => 60, 'coupon' => 10, 'checkout' => 10] as $name => $perMinute) {
+            RateLimiter::for($name, fn (Request $request) => Limit::perMinute($perMinute)->by($who($request)));
+        }
+
         Event::subscribe(AuthEventSubscriber::class);
         Event::listen(PageContentChanged::class, [PageCache::class, 'forget']);
         Event::listen(SettingChanged::class, [LivePaths::class, 'settingChanged']);
         Event::listen(SettingChanged::class, [SiteConfig::class, 'settingChanged']);
+        Event::listen(Login::class, [MergeGuestCartOnLogin::class, 'handle']);
         Event::listen(NotificationSent::class, [RecordNotificationDelivery::class, 'sent']);
         Event::listen(NotificationFailed::class, [RecordNotificationDelivery::class, 'failed']);
     }

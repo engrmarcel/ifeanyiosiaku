@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ContentProtection } from "@/components/protection/ContentProtection";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { CartProvider } from "@/lib/commerce/CartProvider";
 import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsProvider";
 import { GeistMonoLazy } from "@/lib/fonts";
 import { getSiteConfig } from "@/lib/site/config";
@@ -61,6 +62,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <SiteSettingsProvider>
           <AuthProvider>
+            <CartProvider>
             <ToastProvider>
               <ContentProtection />
               <AnnouncementPopup />
@@ -70,6 +72,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               </main>
               <SiteFooter site={site} />
             </ToastProvider>
+            </CartProvider>
           </AuthProvider>
         </SiteSettingsProvider>
       </body>

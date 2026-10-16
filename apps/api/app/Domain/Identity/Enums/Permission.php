@@ -34,6 +34,10 @@ enum Permission: string
 
     /** Store catalogue: products, prices, files, coupons. */
     case CommerceManage = 'commerce.manage';
+    /** See orders and sales (Admins, Finance). */
+    case OrdersView = 'orders.view';
+    /** Cancel unpaid orders; later: approve refunds. */
+    case OrdersManage = 'orders.manage';
 
     /**
      * Default permission bundles per role. Super Administrator receives every permission.
@@ -48,12 +52,12 @@ enum Permission: string
                 self::AdminAccess, self::UsersView, self::UsersManage, self::UsersSuspend,
                 self::SettingsManage, self::AuditLogView, self::SystemHealthView,
                 self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage,
-                self::ContactManage, self::NewsletterManage, self::CommerceManage,
+                self::ContactManage, self::NewsletterManage, self::CommerceManage, self::OrdersView, self::OrdersManage,
             ],
             Role::Editor->value => [self::AdminAccess, self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage],
             Role::Instructor->value => [self::AdminAccess, self::MediaManage],
             Role::Moderator->value => [self::AdminAccess, self::UsersView],
-            Role::Finance->value => [self::AdminAccess, self::UsersView],
+            Role::Finance->value => [self::AdminAccess, self::UsersView, self::OrdersView],
             Role::Member->value => [],
         ];
     }

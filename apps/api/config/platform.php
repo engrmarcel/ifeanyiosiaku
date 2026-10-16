@@ -79,6 +79,8 @@ return [
         'commerce.currencies' => ['NGN'],
         // How many times a buyer may download each file, unless a file sets its own limit.
         'commerce.download_limit' => 5,
+        // Unpaid orders expire after this many minutes (their coupons are freed).
+        'commerce.order_expiry_minutes' => 60,
 
         // Add-on modules (ADR-025). All ON by default; administrators can switch each one off.
         'addons.commerce.enabled' => true,

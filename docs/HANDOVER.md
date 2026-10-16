@@ -15,7 +15,7 @@ Keep this file current so any session can continue without repeating work.
 
 1. CI is green on GitHub; the repository is public. Check https://github.com/engrmarcel/ifeanyiosiaku/actions after each push (run list and annotations are readable without login via the GitHub API).
 2. **Milestone 2 complete** (2026-10-16): steps 1–8 done (media library; pages/blocks/publishing; website rendering; portfolio + homepage; navigation/footer/appearance, redirects, sitemap/robots/JSON-LD; articles, publications, PDF uploads, share bar; announcement popup, contact form, newsletter; custom-code, downloads and diagram blocks; hero motion; Journey F; measured quality — docs/QUALITY_REPORT.md).
-3. **Milestone 3 (Commerce) in progress:** step 1 done (catalogue: products, prices, private files, versions, bundles, store categories, `/store` pages). Next: step 2 (cart, checkout, coupons, orders).
+3. **Milestone 3 (Commerce) in progress:** step 1 done (catalogue: products, prices, private files, versions, bundles, store categories, `/store` pages); step 2 done (cart with visitor cookie and merge on sign-in, coupons, checkout with server prices, orders with state machine and expiry, `/cart`, `/checkout`, `/account/orders`, Orders and Coupons admin — ADR-033). Online payment is **not** connected yet. Next: step 3 (payment gateway contract, FakeGateway, Paystack/Flutterwave adapters, webhooks).
 
 ## Environment notes (this machine)
 

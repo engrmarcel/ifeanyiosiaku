@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { z } from "zod";
 import { serverGet } from "@/lib/api/server";
 import { pageTag } from "@/lib/cms/pages";
+import { SITE_TAG } from "@/lib/site/shared";
 import { productListSchema, productSchema, type Product, type ProductList } from "./schemas";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -70,6 +71,19 @@ export async function getProduct(slug: string, currency?: string): Promise<Produ
   const suffix = currency && CURRENCY.test(currency) ? `?currency=${currency}` : "";
   const { status, body } = await serverGet<{ data: unknown }>(`/api/v1/store/products/${slug}${suffix}`);
   return status === 200 ? parse(productSchema, body?.data, "product") : null;
+}
+
+/**
+ * Whether the store add-on is switched on, for pages that have no product data of their own (cart,
+ * checkout, orders). Cached with the shared layout, which Laravel refreshes when add-ons change.
+ */
+export async function storeIsOpen(): Promise<boolean> {
+  "use cache";
+  cacheTag(SITE_TAG);
+  cacheLife("hours");
+
+  const { status, body } = await serverGet<{ data?: Record<string, unknown> }>("/api/v1/settings/public");
+  return status !== 200 || body?.data?.["addons.commerce.enabled"] !== false;
 }
 
 export function storeHref(filters: StoreFilters): string {

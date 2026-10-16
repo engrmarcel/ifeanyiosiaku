@@ -41,6 +41,6 @@ export const config = {
   // Only addresses that could be CMS pages: everything except the website's own routes, the
   // Laravel-served paths, framework assets and files with an extension.
   matcher: [
-    "/((?!(?:_next|api|admin|media|css|js|fonts|filament|brand|internal|preview|page-not-found|newsletter|healthz|login|register|account|two-factor|verify-email|forgot-password|reset-password)(?:/|$))(?!livewire-)(?!.*\\.[a-zA-Z0-9]+$).+)",
+    "/((?!(?:_next|api|admin|media|css|js|fonts|filament|brand|internal|preview|page-not-found|newsletter|cart|checkout|healthz|login|register|account|two-factor|verify-email|forgot-password|reset-password)(?:/|$))(?!livewire-)(?!.*\\.[a-zA-Z0-9]+$).+)",
   ],
 };
