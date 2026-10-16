@@ -11,7 +11,7 @@ use App\Domain\Settings\Events\SettingChanged;
 class LivePaths
 {
     /** Settings that are displayed inside page content. */
-    private const CONTENT_SETTING_PREFIXES = ['profile.', 'site.', 'addons.'];
+    private const CONTENT_SETTING_PREFIXES = ['profile.', 'site.', 'addons.', 'newsletter.'];
 
     /**
      * @return list<string>

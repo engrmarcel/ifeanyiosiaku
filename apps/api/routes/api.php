@@ -1,12 +1,15 @@
 <?php
 
+use App\Domain\Announcements\Http\AnnouncementController;
 use App\Domain\Captcha\Http\CaptchaController;
 use App\Domain\Cms\Http\PageController;
 use App\Domain\Cms\Http\SitemapController;
+use App\Domain\Contact\Http\ContactController;
 use App\Domain\Content\Http\ArticleController;
 use App\Domain\Content\Http\PublicationController;
 use App\Domain\Identity\Http\CurrentUserController;
 use App\Domain\Identity\Http\SessionController;
+use App\Domain\Newsletter\Http\NewsletterController;
 use App\Domain\Portfolio\Http\ProjectController;
 use App\Domain\Settings\Http\PublicSettingsController;
 use App\Domain\Settings\Http\SiteConfigController;
@@ -52,6 +55,24 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('publications/{slug}', [PublicationController::class, 'show'])
         ->where('slug', '[a-z0-9\-]{1,150}')
         ->name('publications.show');
+
+    Route::get('announcements/current', [AnnouncementController::class, 'current'])->name('announcements.current');
+    Route::post('announcements/{ulid}/events', [AnnouncementController::class, 'event'])
+        ->where('ulid', '[0-9a-z]{26}')
+        ->middleware('throttle:announcement-events')
+        ->name('announcements.events');
+
+    Route::post('contact', [ContactController::class, 'store'])
+        ->middleware(['throttle:contact', 'captcha:contact'])
+        ->name('contact.store');
+
+    Route::prefix('newsletter')->name('newsletter.')->group(function () {
+        Route::post('subscribe', [NewsletterController::class, 'subscribe'])
+            ->middleware(['throttle:newsletter', 'captcha:newsletter'])
+            ->name('subscribe');
+        Route::post('confirm', [NewsletterController::class, 'confirm'])->middleware('throttle:20,1')->name('confirm');
+        Route::post('unsubscribe', [NewsletterController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('unsubscribe');
+    });
 
     Route::prefix('captcha')->name('captcha.')->group(function () {
         Route::get('config', [CaptchaController::class, 'config'])->name('config');

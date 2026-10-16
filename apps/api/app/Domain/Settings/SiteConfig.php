@@ -26,7 +26,7 @@ class SiteConfig
     public const MAX_SOCIAL_LINKS = 10;
 
     /** Settings shown in the website's shared layout; a change refreshes it. */
-    private const LAYOUT_SETTING_PREFIXES = ['navigation.', 'social.', 'theme.', 'seo.', 'site.', 'profile.', 'addons.'];
+    private const LAYOUT_SETTING_PREFIXES = ['navigation.', 'social.', 'theme.', 'seo.', 'site.', 'profile.', 'addons.', 'newsletter.'];
 
     public function __construct(
         private readonly SettingsRepository $settings,
@@ -58,6 +58,10 @@ class SiteConfig
             ], self::social($this->settings->get('social.links'))),
             'theme' => ['accent' => $accent->value, 'tokens' => $accent->tokens()],
             'indexing' => $this->indexing(),
+            'newsletter' => [
+                'enabled' => $this->settings->bool('newsletter.enabled'),
+                'consentText' => (string) $this->settings->get('newsletter.consent_text'),
+            ],
             'profile' => [
                 'name' => $profile['name'],
                 'headline' => $profile['headline'],

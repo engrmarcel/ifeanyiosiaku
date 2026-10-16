@@ -27,6 +27,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         "/two-factor",
         "/verify-email",
         "/page-not-found",
+        "/newsletter/",
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,

@@ -6,8 +6,10 @@ use App\Domain\Cms\Blocks\BlockRegistry;
 use App\Domain\Cms\Events\PageContentChanged;
 use App\Domain\Cms\LivePaths;
 use App\Domain\Cms\PageCache;
+use App\Domain\Contact\Blocks\ContactFormBlock;
 use App\Domain\Content\Blocks\ArticlesBlock;
 use App\Domain\Identity\Listeners\AuthEventSubscriber;
+use App\Domain\Newsletter\Blocks\NewsletterSignupBlock;
 use App\Domain\Notifications\Listeners\RecordNotificationDelivery;
 use App\Domain\Portfolio\Blocks\PortfolioBlocks;
 use App\Domain\Settings\Events\SettingChanged;
@@ -34,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->afterResolving(BlockRegistry::class, function (BlockRegistry $registry) {
             PortfolioBlocks::register($registry);
             $registry->register(ArticlesBlock::class);
+            $registry->register(ContactFormBlock::class);
+            $registry->register(NewsletterSignupBlock::class);
         });
     }
 
@@ -69,6 +73,18 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('captcha', fn (Request $request) => Limit::perMinute(20)->by('captcha:'.$request->ip()));
+
+        // Contact form and newsletter: a few submissions per visitor, plus a per-address cap so one
+        // email address cannot be flooded from many machines.
+        RateLimiter::for('contact', fn (Request $request) => [
+            Limit::perMinutes(10, 3)->by('contact:'.$request->ip()),
+            Limit::perDay(20)->by('contact-day:'.$request->ip()),
+        ]);
+        RateLimiter::for('newsletter', fn (Request $request) => [
+            Limit::perMinutes(10, 5)->by('newsletter:'.$request->ip()),
+            Limit::perDay(5)->by('newsletter-email:'.sha1(strtolower(trim((string) $request->input('email'))))),
+        ]);
+        RateLimiter::for('announcement-events', fn (Request $request) => Limit::perMinute(30)->by('announcement:'.$request->ip()));
 
         Event::subscribe(AuthEventSubscriber::class);
         Event::listen(PageContentChanged::class, [PageCache::class, 'forget']);

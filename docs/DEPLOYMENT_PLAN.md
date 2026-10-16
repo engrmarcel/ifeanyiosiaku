@@ -95,7 +95,9 @@ apex ifeanyiosiaku.online → 301 → www
 - [ ] Website `NEXT_PUBLIC_SITE_URL` set to the public https:// address (used in the sitemap, robots.txt and search-engine data); "Let search engines list this website" is ON for the live site and OFF on any test copy
 - [ ] Web server serves `/media` with `X-Content-Type-Options: nosniff`, the sandbox CSP, and `Content-Disposition: attachment` for `.pdf` files (same headers as MediaFileController)
 - [ ] Scheduler runs `content:announce-scheduled` every minute (scheduled articles, publications and projects appear on time)
-- [ ] Starting content installed once: `php artisan db:seed --class=InitialContentSeeder --force` (safe to re-run; never overwrites edits)
+- [ ] After each deploy: `php artisan db:seed --class=RolesAndPermissionsSeeder --force` (adds new permissions such as contact.manage and newsletter.manage)
+- [ ] Site settings: contact-form recipient email set; newsletter sign-up switched on **only** after transactional email is configured and tested
+- [ ] Starting content installed once: `php artisan db:seed --class=InitialContentSeeder --force` (safe to re-run; never overwrites edits; creates the homepage and the /contact page if missing)
 
 ## 6. Backups (summary — full procedure in BACKUP_AND_RECOVERY.md, M9)
 

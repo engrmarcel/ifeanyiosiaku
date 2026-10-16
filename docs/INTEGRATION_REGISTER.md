@@ -30,7 +30,7 @@ A configuration form existing in the admin panel does **not** change status.
 | Redis | Queues, cache, locks, rate limits | M1 (prod) | Not implemented | Redis on host or managed | `REDIS_HOST`, `REDIS_PASSWORD`, `REDIS_PORT` |
 | Error monitoring | Exceptions/alerts | M8 | Not implemented | Sentry (or similar) project DSN | `SENTRY_LARAVEL_DSN`, `NEXT_PUBLIC_SENTRY_DSN` |
 | Web analytics | Privacy-friendly traffic stats | M7 | Not implemented | e.g. Plausible/Umami (owner choice) | `NEXT_PUBLIC_ANALYTICS_*` |
-| Newsletter (optional) | External list sync | M2 | Not implemented | Optional (Mailchimp/Brevo) — internal list works without it | provider API key |
+| Newsletter (optional) | External list sync / campaign sending | M2 | Not implemented — the internal double opt-in list **is implemented**, with CSV export for importing into an email tool | Optional (Mailchimp/Brevo); keep sign-up OFF until transactional email is configured | provider API key |
 | Have I Been Pwned | Breached-password check | M1 | **Implemented** (Laravel `uncompromised()` rule, enabled only when `APP_ENV=production`; never exercised against the live API yet) | None (k-anonymity range API, no key) | — |
 
 ## Per-integration documentation template

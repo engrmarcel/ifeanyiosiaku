@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { AnnouncementPopup } from "@/components/engagement/AnnouncementPopup";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ContentProtection } from "@/components/protection/ContentProtection";
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <AuthProvider>
             <ToastProvider>
               <ContentProtection />
+              <AnnouncementPopup />
               <SiteHeader name={site.name} links={site.navigation.header} />
               <main id="main" className="flex flex-1 flex-col">
                 {children}

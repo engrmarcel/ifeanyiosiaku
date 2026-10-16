@@ -3,6 +3,7 @@
 namespace App\Domain\Notifications\Listeners;
 
 use App\Models\User;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,12 @@ class RecordNotificationDelivery
 
     private function record(mixed $notifiable, string $notification, string $channel, string $status, ?string $error = null): void
     {
-        $address = $notifiable instanceof User ? $notifiable->email : null;
+        // Accounts, or addresses emailed directly (contact alerts, newsletter confirmations).
+        $address = match (true) {
+            $notifiable instanceof User => $notifiable->email,
+            $notifiable instanceof AnonymousNotifiable => is_string($notifiable->routes[$channel] ?? null) ? $notifiable->routes[$channel] : null,
+            default => null,
+        };
 
         DB::table('notification_deliveries')->insert([
             'user_id' => $notifiable instanceof User ? $notifiable->getKey() : null,

@@ -111,8 +111,8 @@ provider failure/rate limit); CSRF rejection; health endpoints respond; CI green
 - [x] Slugs + automatic and manual redirects (loop/chain protection, visit counts, https destinations); per-page SEO fields; sitemap.xml, robots.txt, search-engine indexing switch, JSON-LD (Person, WebSite, CreativeWork) — ADR-028
 - [~] Homepage composed of configurable section blocks (hero with portrait + terminal, about, expertise, work, services, call to action), reduced-motion safe. **Remaining:** subtle code-particle/grid motion effects; sections from later modules (courses, products, articles, events, leaderboard) arrive with those modules
 - [ ] Raw HTML block in sandboxed iframe (Super Admin only)
-- [ ] Announcement popup (global OFF default), analytics events
-- [ ] Contact form (CAPTCHA, rate limit, email notification); newsletter (double opt-in, feature flag)
+- [x] Announcement popup: global switch OFF by default and overriding every schedule (tested); title, message, image, button, dates, audience (everyone/visitors/members), pages, frequency (once/visit/daily/always), priority, campaign tag; accessible dialog (focus, Escape, return focus); shown/clicked/closed counts per announcement — ADR-030
+- [x] Contact form section + seeded /contact page (CAPTCHA, rate limits, header-injection and link-spam checks, admin inbox, email to a chosen address with Reply-To; no auto-reply); newsletter sign-up (OFF by default; double opt-in confirmed by a button press, consent record, always-working unsubscribe, CSV export) — ADR-030. Sending newsletter campaigns is not built (export to an email tool for now)
 - [x] Next.js on-demand revalidation on publish (verified end-to-end: publish visible immediately; renamed page 301; missing page 404 via proxy pre-check, ADR-027)
 - [x] InitialContentSeeder: approved profile copy, portrait, 9 skills, published homepage; experience/certifications/testimonials left empty (no invented history)
 

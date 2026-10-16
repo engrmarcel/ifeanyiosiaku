@@ -27,6 +27,11 @@ enum Permission: string
     case MediaManage = 'media.manage';
     case PortfolioManage = 'portfolio.manage';
 
+    /** Contact-form inbox (contains visitors' personal data). */
+    case ContactManage = 'contact.manage';
+    /** Newsletter subscriber list and export. */
+    case NewsletterManage = 'newsletter.manage';
+
     /**
      * Default permission bundles per role. Super Administrator receives every permission.
      *
@@ -40,6 +45,7 @@ enum Permission: string
                 self::AdminAccess, self::UsersView, self::UsersManage, self::UsersSuspend,
                 self::SettingsManage, self::AuditLogView, self::SystemHealthView,
                 self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage,
+                self::ContactManage, self::NewsletterManage,
             ],
             Role::Editor->value => [self::AdminAccess, self::CmsManage, self::CmsPublish, self::MediaManage, self::PortfolioManage],
             Role::Instructor->value => [self::AdminAccess, self::MediaManage],

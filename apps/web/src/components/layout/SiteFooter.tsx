@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewsletterForm } from "@/components/engagement/NewsletterForm";
 import { isExternal, type SiteConfig } from "@/lib/site/shared";
 
 /** Footer: admin-configured links, social profiles and the footer line. */
@@ -8,6 +9,15 @@ export function SiteFooter({ site }: { site: SiteConfig }) {
   return (
     <footer className="border-t border-border/70">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 text-sm text-muted sm:px-6">
+        {site.newsletter.enabled && (
+          <section aria-labelledby="footer-newsletter" className="max-w-md">
+            <h2 id="footer-newsletter" className="font-mono text-xs tracking-wider text-text uppercase">
+              Newsletter
+            </h2>
+            <p className="mt-1 mb-3 text-sm">Occasional updates on new articles, courses and events.</p>
+            <NewsletterForm buttonLabel="Subscribe" consentText={site.newsletter.consentText} source="footer" compact />
+          </section>
+        )}
         {(footer.length > 0 || site.social.length > 0) && (
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             {footer.length > 0 && (

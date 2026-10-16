@@ -11,6 +11,8 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -36,6 +38,9 @@ class SiteSettings extends Page
     private const KEYS = [
         'protection.allow_saving_and_inspect' => 'bool',
         'registration.enabled' => 'bool',
+        'contact.recipient_email' => 'email',
+        'newsletter.enabled' => 'bool',
+        'newsletter.consent_text' => 'text',
         'announcements.enabled' => 'bool',
         'seo.allow_indexing' => 'bool',
         'security.require_staff_two_factor' => 'bool',
@@ -104,6 +109,26 @@ class SiteSettings extends Page
                         Toggle::make(self::field('registration.enabled'))
                             ->label('Allow new members to register'),
                     ]),
+                Section::make('Contact form')
+                    ->schema([
+                        TextInput::make(self::field('contact.recipient_email'))
+                            ->label('Email new messages to')
+                            ->email()
+                            ->maxLength(254)
+                            ->helperText('Every message is kept in Inbox → Contact messages. Leave empty to not send emails. Emails are only delivered once an email provider is configured on the server.'),
+                    ]),
+                Section::make('Newsletter')
+                    ->schema([
+                        Toggle::make(self::field('newsletter.enabled'))
+                            ->label('Show the newsletter sign-up form')
+                            ->helperText('Off by default. Turn on once an email provider is configured, because people must confirm by clicking a link in an email (double opt-in). Unsubscribe links always keep working.'),
+                        Textarea::make(self::field('newsletter.consent_text'))
+                            ->label('What people agree to')
+                            ->rows(2)
+                            ->maxLength(300)
+                            ->required()
+                            ->helperText('Shown next to the tick box and stored with each sign-up as a record of consent.'),
+                    ]),
                 Section::make('Announcements')
                     ->schema([
                         Toggle::make(self::field('announcements.enabled'))
@@ -169,6 +194,13 @@ class SiteSettings extends Page
 
             if ($type === 'bool') {
                 $value = (bool) $state[self::field($key)];
+            } elseif ($type === 'email' || $type === 'text') {
+                $value = trim((string) $state[self::field($key)]);
+                $value = $value === '' ? null : $value;
+
+                if ($type === 'email' && $value !== null && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    continue;
+                }
             } else {
                 $value = (string) $state[self::field($key)];
 

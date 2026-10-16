@@ -41,6 +41,32 @@ class InitialContentSeeder extends Seeder
         if (! Page::query()->withTrashed()->where('is_homepage', true)->exists() && ! Page::query()->withTrashed()->where('slug', 'home')->exists()) {
             $this->homepage($portrait);
         }
+
+        if (! Page::query()->withTrashed()->where('slug', 'contact')->exists()) {
+            $this->contactPage();
+        }
+    }
+
+    private function contactPage(): void
+    {
+        $page = app(SavePageDraft::class)->handle(new Page, [
+            'title' => 'Contact',
+            'slug' => 'contact',
+            'template' => 'default',
+            'seo' => [
+                'title' => 'Contact Ifeanyi Osiaku',
+                'description' => 'Get in touch about software, AI, business intelligence and data analytics projects, training or speaking.',
+            ],
+            'blocks' => [
+                ['type' => 'contact_form', 'data' => [
+                    'heading' => 'Send a message',
+                    'intro' => 'Questions about a project, training or speaking? Send a message and I will reply by email.',
+                    'button_label' => 'Send message',
+                ]],
+            ],
+        ], null);
+
+        app(PublishPage::class)->handle($page, null);
     }
 
     private function portrait(): ?MediaAsset

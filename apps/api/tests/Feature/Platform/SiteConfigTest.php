@@ -16,7 +16,7 @@ it('serves the default navigation, theme and identity', function () {
     siteConfig()
         ->assertJsonPath('data.name', 'Ifeanyi Osiaku')
         ->assertJsonPath('data.navigation.header.0', ['label' => 'About', 'url' => '/#about', 'newTab' => false])
-        ->assertJsonCount(3, 'data.navigation.header')
+        ->assertJsonCount(4, 'data.navigation.header')
         ->assertJsonPath('data.navigation.footer', [])
         ->assertJsonPath('data.social', [])
         ->assertJsonPath('data.theme.accent', 'green')
@@ -80,7 +80,7 @@ it('rejects unsafe links and invalid social profiles in the admin', function () 
         ->call('save')
         ->assertHasFormErrors();
 
-    expect(app(SettingsRepository::class)->get('navigation.header'))->toHaveCount(3);
+    expect(app(SettingsRepository::class)->get('navigation.header'))->toHaveCount(4);
 });
 
 it('limits the navigation page to content staff', function () {

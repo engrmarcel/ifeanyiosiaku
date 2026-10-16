@@ -219,16 +219,16 @@ erDiagram
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `announcements` | title, message, media_id, cta_text, cta_url, starts_at, ends_at, audience JSON, frequency (`once/session/daily/always`), dismissal (`session/persistent`), priority, campaign, status | global switch is setting `announcements.enabled = false` (default) |
-| `announcement_events` | announcement_id, user_id or anon_id, type (`impression/click/dismiss`), created_at | aggregated nightly |
+| `announcements` | ulid, title, message, media_id, cta_label, cta_url (SafeUrl), starts_at, ends_at, audience (`everyone/guests/members`), placement (`all/home`), frequency (`once/session/daily/always`; closing = dismissal), priority, campaign, is_active | **implemented M2**; global switch is setting `announcements.enabled = false` (default) |
+| `announcement_events` | announcement_id, user_id, visitor_hash (HMAC of a random browser id), type (`impression/click/dismiss`), created_at | **implemented M2**; repeat impressions within 30 min not counted; counts computed live; rows pruned after 13 months |
 | `notification_templates` | key, channel, subject, body (Markdown + variables), locale, is_active | |
 | `notifications` | Laravel standard database notifications | |
 | `notification_deliveries` | notifiable, template_key, channel, status, provider_message_id, attempts, error, sent_at | |
-| `newsletter_subscribers` | email (unique), status, consent_at, consent_source, confirmed_at (double opt-in), unsubscribed_at | |
+| `newsletter_subscribers` | ulid, email (unique), status (`pending/subscribed/unsubscribed`), consent_at, consent_source, consent_text, ip_hash, confirmation_sent_at, confirmed_at (double opt-in), unsubscribed_at | **implemented M2**; signed links (HMAC), confirmation valid 7 days |
 | `integration_configs` | integration (unique), enabled, mode (`sandbox/live`), public_config JSON, status, last_verified_at, last_error | secrets in env only |
 | `captcha_challenges` | id (random), purpose, session_hash, difficulty, expires_at, consumed_at | or Redis with TTL; unique id; purge job |
 | `job_heartbeats` | job, last_run_at, last_status | scheduler monitoring |
-| `contact_messages` | name, email, subject, message, status, ip_hash | |
+| `contact_messages` | ulid, name, email, subject, message, status (`new/read/replied/spam/archived`), user_id, ip_hash (HMAC), page, handled_by, handled_at | **implemented M2**; pruned after 24 months |
 
 ## 3. Key constraints protecting money and access
 

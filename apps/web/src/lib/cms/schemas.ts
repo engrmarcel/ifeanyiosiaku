@@ -142,6 +142,8 @@ export const blockSchemas = {
     ),
   }),
   articles: sectionHeader.extend({ items: z.array(articleCardSchema), allUrl: z.string().nullable() }),
+  contact_form: sectionHeader.extend({ buttonLabel: z.string() }),
+  newsletter_signup: sectionHeader.extend({ buttonLabel: z.string(), enabled: z.boolean(), consentText: z.string() }),
   testimonials: sectionHeader.extend({
     items: z.array(z.object({ quote: z.string(), author: z.string(), title: z.string().nullable(), avatar: mediaSchema.nullable() })),
   }),

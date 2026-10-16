@@ -34,6 +34,7 @@ return [
             ['label' => 'About', 'url' => '/#about', 'new_tab' => false, 'addon' => null],
             ['label' => 'Work', 'url' => '/#work', 'new_tab' => false, 'addon' => null],
             ['label' => 'Services', 'url' => '/#services', 'new_tab' => false, 'addon' => null],
+            ['label' => 'Contact', 'url' => '/contact', 'new_tab' => false, 'addon' => null],
         ],
         'navigation.footer' => [],
         'social.links' => [],
@@ -54,6 +55,13 @@ return [
         'captcha.driver' => env('CAPTCHA_DRIVER', 'first_party'),
 
         'registration.enabled' => true,
+
+        // Contact form: messages are always kept in Admin → Inbox; they are also emailed here when set.
+        'contact.recipient_email' => null,
+
+        // Newsletter sign-up is OFF until an email provider can deliver confirmation emails.
+        'newsletter.enabled' => false,
+        'newsletter.consent_text' => 'Send me occasional emails about new articles, courses and events. I can unsubscribe at any time.',
 
         // OFF by default: the website discourages saving images, right-click and developer-tools shortcuts.
         // This deters casual copying only; it cannot technically prevent it (see DECISIONS ADR-024).
@@ -81,6 +89,8 @@ return [
         'announcements.enabled',
         'captcha.driver',
         'registration.enabled',
+        'newsletter.enabled',
+        'newsletter.consent_text',
         'protection.allow_saving_and_inspect',
         'addons.commerce.enabled',
         'addons.learning.enabled',

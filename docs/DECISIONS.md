@@ -467,3 +467,41 @@ editions over time. Visitors should be able to share any of it easily.
   each network's share page, so **no third-party scripts, cookies or tracking** load on the site. Icons use the
   official simple-icons shapes (CC0); LinkedIn withdrew its logo from that set, so a simple "in" mark is drawn.
   Event, course and store item pages will use the same component when those modules are built (roadmap M3–M5).
+
+## ADR-030 — Announcement popup, contact form and newsletter
+**Status:** Accepted · 2026-10-16
+
+**Context.** The owner wants to promote launches, receive enquiries and build a mailing list, without nuisance
+popups, spam, or sending email on behalf of attackers, and with honest consent records.
+
+**Decision.**
+- **Announcements:** the server checks the master switch `announcements.enabled` (OFF by default) on every
+  request, so nothing shows while it is off, even active or scheduled announcements (REQ-ANN-1, tested on both
+  sides). The highest-priority running announcement for the visitor (audience) and page (placement) is shown in
+  the accessible Radix dialog. It never appears on admin, account, sign-in, preview or newsletter pages.
+  "How often" is remembered only in the visitor's browser (no cookies), and editing the text shows it again.
+  Statistics use a random browser id that the server stores only as a keyed hash. Reloads within 30 minutes are
+  not counted twice, and raw events are deleted after 13 months. Creating or editing announcements needs the
+  publish permission and is audit-logged. Button links use the same safe-link rule as page blocks (T19).
+- **Contact form:**
+  - It is a page section; a `/contact` page is seeded and "Contact" is added to the default menu.
+  - CAPTCHA, plus limits of 3 per 10 minutes and 20 per day per visitor. Line breaks in the name or subject are
+    refused (email header injection), and messages with many links are stored as spam and not emailed.
+  - Messages always land in Inbox → Contact messages (new `contact.manage` permission, Admins).
+  - They are also emailed to the address set in Site settings, with Reply-To set to the sender. The sender's
+    text appears literally, so it cannot become links or formatting in the owner's inbox.
+  - **No automatic reply**, so the form cannot be used to send our email to strangers.
+  - IP addresses are kept only as keyed hashes; messages are deleted after 24 months.
+- **Newsletter:**
+  - Sign-up is **OFF by default** (`newsletter.enabled`), because confirmation emails need a real email
+    provider (none configured yet).
+  - Double opt-in: the emailed link (signed, valid 7 days, replaced by any newer email) opens a page where the
+    person **presses a button**, so email security scanners that open links cannot subscribe anyone.
+  - The response is identical whether or not an address is already listed. Confirmations are resent at most
+    every 10 minutes, with a per-address daily limit.
+  - Each sign-up stores the consent wording, source and time. Unsubscribe links never expire and work even with
+    sign-up off.
+  - Admins (new `newsletter.manage` permission) can view, erase and export confirmed subscribers to CSV, with
+    spreadsheet formulas neutralised and each export audit-logged.
+  - Sending campaigns and Mailchimp/Brevo sync are not built (see INTEGRATION_REGISTER).
+- Email delivery logs now also record (hashed) addresses that are not accounts.

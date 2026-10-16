@@ -37,7 +37,7 @@ return [
         'api', 'admin', 'media', 'login', 'register', 'logout', 'account', 'two-factor', 'verify-email',
         'forgot-password', 'reset-password', 'preview', 'healthz', 'sitemap.xml', 'robots.txt',
         'livewire', 'filament', 'css', 'js', 'fonts', 'storage', 'brand', '_next',
-        'articles', 'publications', 'page-not-found', 'internal',
+        'articles', 'publications', 'page-not-found', 'internal', 'newsletter',
     ],
 
     // Website sections whose items live at /{section}/{slug}. Old item addresses may be redirected.

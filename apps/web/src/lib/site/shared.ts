@@ -24,6 +24,7 @@ export const siteConfigSchema = z.object({
     }),
   }),
   indexing: z.boolean(),
+  newsletter: z.object({ enabled: z.boolean(), consentText: z.string() }),
   profile: z.object({
     name: z.string(),
     headline: z.string().nullable(),
@@ -46,12 +47,14 @@ export const FALLBACK_SITE_CONFIG: SiteConfig = {
       { label: "About", url: "/#about", newTab: false },
       { label: "Work", url: "/#work", newTab: false },
       { label: "Services", url: "/#services", newTab: false },
+      { label: "Contact", url: "/contact", newTab: false },
     ],
     footer: [],
   },
   social: [],
   theme: { accent: "green", tokens: { accent: "#a3f7bf", accentStrong: "#7fe9a3", accentInk: "#062012" } },
   indexing: true,
+  newsletter: { enabled: false, consentText: "" },
   profile: { name: "Ifeanyi Osiaku", headline: null, shortBio: null, portrait: null },
 };
 

@@ -1,6 +1,8 @@
 <?php
 
+use App\Domain\Announcements\Models\AnnouncementEvent;
 use App\Domain\Captcha\Models\CaptchaChallenge;
+use App\Domain\Contact\Models\ContactMessage;
 use App\Http\Controllers\HealthController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schedule;
@@ -13,5 +15,6 @@ Schedule::call(fn () => Cache::put(HealthController::SCHEDULER_HEARTBEAT_KEY, no
 Schedule::command('cms:publish-scheduled')->everyMinute()->withoutOverlapping();
 Schedule::command('content:announce-scheduled')->everyMinute()->withoutOverlapping();
 Schedule::command('model:prune', ['--model' => [CaptchaChallenge::class]])->hourly();
+Schedule::command('model:prune', ['--model' => [AnnouncementEvent::class, ContactMessage::class]])->daily();
 Schedule::command('auth:clear-resets')->daily();
 Schedule::command('queue:prune-failed', ['--hours' => 24 * 30])->daily();
