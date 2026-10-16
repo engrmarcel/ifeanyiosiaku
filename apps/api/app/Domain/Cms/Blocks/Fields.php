@@ -26,6 +26,13 @@ class Fields
             ->helperText('Upload new images in Content → Media library.');
     }
 
+    /** Picker over the media library's PDF documents, storing the asset's public ID (for page blocks). */
+    public static function document(string $name, string $label = 'PDF document'): Select
+    {
+        return self::picker($name, $label, 'ulid', images: false)
+            ->helperText('Upload PDFs in Content → Media library.');
+    }
+
     /** Picker over the media library's PDF documents, storing the asset's database ID. */
     public static function documentById(string $name, string $label = 'PDF document'): Select
     {

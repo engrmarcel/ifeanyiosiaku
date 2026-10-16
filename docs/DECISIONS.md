@@ -505,3 +505,40 @@ popups, spam, or sending email on behalf of attackers, and with honest consent r
     spreadsheet formulas neutralised and each export audit-logged.
   - Sending campaigns and Mailchimp/Brevo sync are not built (see INTEGRATION_REGISTER).
 - Email delivery logs now also record (hashed) addresses that are not accounts.
+
+## ADR-031 — Custom code, downloads and diagram blocks; quality fixes
+**Status:** Accepted · 2026-10-16
+
+**Context.** REQ-CMS-8 asks for trusted HTML/CSS/JS on pages. Running such code inside the site would let it read
+visitors' sessions or change the page. Diagrams and downloads were the remaining planned blocks. Milestone 2's
+acceptance requires measured Lighthouse/axe results.
+
+**Decision.**
+- **Custom code is never inserted into the page.**
+  - The block's props carry only a signed address `/api/v1/embeds/{token}`. The token names the page, the
+    block's position, a fingerprint of the code, and for drafts a 15-minute expiry.
+  - Laravel serves exactly that code as its own document, with `Content-Security-Policy: sandbox allow-scripts
+    allow-popups allow-forms …; frame-ancestors 'self'` and `X-Frame-Options: SAMEORIGIN`; every other response
+    still refuses framing.
+  - The website shows it in an `<iframe sandbox>` without `allow-same-origin`.
+  - Result, verified in Chrome while signed in as a Super Administrator: the code runs with origin `null` and
+    cannot read cookies, storage, the parent page or `/api/v1/me`.
+  - "Fit content" height is reported by `postMessage`; the website accepts it only from that frame and clamps it.
+  - Changing or removing the code invalidates old addresses.
+- **Only staff with `cms.raw_html` (Super Administrators) may add or change custom code.**
+  `SavePageDraft` compares content fingerprints with the previous draft. Other editors may still move, hide or
+  remove the block and edit the rest of the page. Every change is audit-logged (`page.raw_html_changed`).
+- **Downloads block:** PDFs from the media library (usage-protected), with file sizes. Paid files go through the
+  store (M3).
+- **Diagram block:** Mermaid text, drawn in the browser in Mermaid's `strict` security level; `%%{init}`
+  directives are refused. A required text description is the accessible name and the fallback. The library loads
+  only when a diagram is near the screen.
+  - Versions: mermaid 12.1.0 (not the three-day-old 12.2.0), with an npm override pinning KaTeX to 0.18.11, which
+    fixes a low-severity advisory; `npm audit` is clean.
+- **Quality fixes found by measurement** (QUALITY_REPORT.md):
+  - Visitors no longer trigger a console 401 on every page: a new public `GET /api/v1/session` returns
+    `{data: null}`, while `/me` keeps refusing visitors.
+  - Zod runs `jitless`, so there are no CSP `eval` reports.
+  - The code font is not preloaded, giving the hero image priority.
+  - The header no longer ships the validation library to browsers.
+- **Hero motion:** CSS-only grid drift and floating code glyphs, on large screens only, disabled for reduced motion.

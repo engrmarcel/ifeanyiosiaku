@@ -5,14 +5,7 @@ use App\Domain\Cms\Models\Page;
 use App\Domain\Identity\Enums\Role;
 use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Pages\Pages\EditPage;
-use Illuminate\Support\Str;
 use Livewire\Livewire;
-
-/** Builder state is keyed by item UUID inside Livewire. */
-function builderState(array $blocks): array
-{
-    return collect($blocks)->mapWithKeys(fn (array $b) => [(string) Str::uuid() => $b])->all();
-}
 
 it('creates a page draft with blocks from the admin panel', function () {
     $this->actingAs(contentStaff());

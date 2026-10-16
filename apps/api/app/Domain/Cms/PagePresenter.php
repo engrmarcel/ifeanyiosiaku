@@ -41,7 +41,7 @@ class PagePresenter
                 'noindex' => $draft || (bool) ($seo['noindex'] ?? false),
                 'image' => $ogMedia?->toPublicArray(),
             ],
-            'blocks' => $this->blocks->toPublic($source->blocks ?? []),
+            'blocks' => $this->blocks->toPublic($source->blocks ?? [], ['page' => $page->ulid, 'draft' => $draft]),
         ];
     }
 }

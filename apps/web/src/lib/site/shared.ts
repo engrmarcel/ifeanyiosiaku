@@ -58,7 +58,4 @@ export const FALLBACK_SITE_CONFIG: SiteConfig = {
   profile: { name: "Ifeanyi Osiaku", headline: null, shortBio: null, portrait: null },
 };
 
-/** Whether a link points outside this website. */
-export function isExternal(url: string): boolean {
-  return /^(https?:|mailto:)/i.test(url);
-}
+export { isExternal } from "./links";

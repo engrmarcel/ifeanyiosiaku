@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { blockSchemas, type BlockType, type CmsBlock } from "@/lib/cms/schemas";
+import * as A from "./advanced";
 import * as B from "./blocks";
 import * as C from "./content";
 import * as E from "./engagement";
@@ -37,6 +38,9 @@ const renderers: Record<BlockType, Renderer> = {
   articles: C.ArticlesBlock as Renderer,
   contact_form: E.ContactFormBlock as Renderer,
   newsletter_signup: E.NewsletterSignupBlock as Renderer,
+  raw_html: A.RawHtmlBlock as Renderer,
+  downloads: A.DownloadsBlock as Renderer,
+  diagram: A.DiagramBlock as Renderer,
 };
 
 export function isKnownBlock(type: string): type is BlockType {

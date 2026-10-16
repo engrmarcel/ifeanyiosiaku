@@ -6,14 +6,35 @@ use App\Domain\Settings\SettingsRepository;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CurrentUserController
 {
     public function __invoke(#[CurrentUser] User $user, SettingsRepository $settings): JsonResponse
     {
+        return response()->json(['data' => self::present($user, $settings)]);
+    }
+
+    /**
+     * The signed-in user, or null for visitors. Public, so the website can check on every page
+     * without the browser logging an "Unauthorized" error for each visitor.
+     */
+    public function state(Request $request, SettingsRepository $settings): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json(['data' => $user instanceof User ? self::present($user, $settings) : null])
+            ->header('Cache-Control', 'no-store, private');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function present(User $user, SettingsRepository $settings): array
+    {
         $user->load('profile');
 
-        return response()->json(['data' => [
+        return [
             'id' => $user->ulid,
             'name' => $user->name,
             'email' => $user->email,
@@ -31,6 +52,6 @@ class CurrentUserController
                 'visibility' => $user->profile->visibility->value,
                 'show_on_leaderboard' => $user->profile->show_on_leaderboard,
             ] : null,
-        ]]);
+        ];
     }
 }

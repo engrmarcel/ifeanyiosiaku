@@ -166,6 +166,47 @@ html.io-protect picture {
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
 }
 
+/*
+ * Hero motion: the grid drifts very slowly and a few code glyphs float upwards. CSS-only (no
+ * JavaScript), transform/opacity only (cheap to animate), larger screens only, and fully off for
+ * visitors who ask for reduced motion.
+ */
+.io-code-particles { display: none; }
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .io-grid-backdrop--drift { animation: io-grid-drift 40s linear infinite; }
+
+  .io-code-particles { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .io-code-particles span {
+    position: absolute;
+    bottom: -2rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--io-accent);
+    opacity: 0;
+    animation: io-particle-rise 16s linear infinite;
+    will-change: transform, opacity;
+  }
+  .io-code-particles span:nth-child(1) { left: 8%; animation-delay: 0s; }
+  .io-code-particles span:nth-child(2) { left: 22%; animation-delay: 5s; animation-duration: 19s; }
+  .io-code-particles span:nth-child(3) { left: 41%; animation-delay: 9s; }
+  .io-code-particles span:nth-child(4) { left: 58%; animation-delay: 2s; animation-duration: 21s; }
+  .io-code-particles span:nth-child(5) { left: 76%; animation-delay: 12s; }
+  .io-code-particles span:nth-child(6) { left: 90%; animation-delay: 7s; animation-duration: 18s; }
+}
+
+@keyframes io-grid-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 48px 48px, 48px 48px; }
+}
+
+@keyframes io-particle-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.22; }
+  85% { opacity: 0.22; }
+  100% { transform: translateY(-34rem); opacity: 0; }
+}
+
 @keyframes io-caret-blink {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }

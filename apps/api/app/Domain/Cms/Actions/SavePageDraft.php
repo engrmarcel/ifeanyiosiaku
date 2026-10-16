@@ -4,14 +4,17 @@ namespace App\Domain\Cms\Actions;
 
 use App\Domain\Audit\AuditLogger;
 use App\Domain\Cms\Blocks\BlockRegistry;
+use App\Domain\Cms\Blocks\Types\RawHtmlBlock;
 use App\Domain\Cms\Enums\PageStatus;
 use App\Domain\Cms\Models\Page;
 use App\Domain\Cms\Support\SafeUrl;
+use App\Domain\Identity\Enums\Permission;
 use App\Domain\Media\MediaUsageRecorder;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Saves the working draft of a page (never visible to visitors) and records a draft revision.
@@ -59,12 +62,19 @@ class SavePageDraft
         ])->validate();
 
         $blocks = $this->blocks->prepare(is_array($input['blocks'] ?? null) ? $input['blocks'] : []);
+        $rawChanges = $this->rawHtmlChanges($page->exists ? ($page->blocks ?? []) : [], $blocks);
+
+        if ($rawChanges !== [] && ! ($actor?->can(Permission::CmsRawHtml->value) ?? false)) {
+            throw ValidationException::withMessages([
+                'blocks' => 'Only a Super Administrator can add or change custom code blocks. Undo your changes to those blocks (moving, hiding or removing them is fine).',
+            ]);
+        }
 
         if (isset($validated['seo']['canonical_url']) && ! SafeUrl::isSafe($validated['seo']['canonical_url'])) {
             unset($validated['seo']['canonical_url']);
         }
 
-        return DB::transaction(function () use ($page, $validated, $blocks, $actor) {
+        return DB::transaction(function () use ($page, $validated, $blocks, $actor, $rawChanges) {
             $page->fill([
                 'title' => $validated['title'],
                 'slug' => $validated['slug'],
@@ -96,7 +106,46 @@ class SavePageDraft
             ]);
             $this->audit->record('page.draft_saved', $page, ['slug' => $page->slug], $actor);
 
+            if ($rawChanges !== []) {
+                $this->audit->record('page.raw_html_changed', $page, ['slug' => $page->slug, 'blocks' => $rawChanges], $actor);
+            }
+
             return $page;
         });
+    }
+
+    /**
+     * Custom-code blocks that are new or changed compared with the previous draft (moving, hiding
+     * and removing do not count). Returned as content fingerprints for the audit log.
+     *
+     * @param  array<int|string, mixed>  $before
+     * @param  list<array{type: string, data: array<string, mixed>}>  $after
+     * @return list<string>
+     */
+    private function rawHtmlChanges(array $before, array $after): array
+    {
+        $existing = [];
+        foreach ($before as $block) {
+            if (is_array($block) && ($block['type'] ?? null) === RawHtmlBlock::type()) {
+                $print = RawHtmlBlock::protectedFingerprint(is_array($block['data'] ?? null) ? $block['data'] : []);
+                $existing[$print] = ($existing[$print] ?? 0) + 1;
+            }
+        }
+
+        $changed = [];
+        foreach ($after as $block) {
+            if ($block['type'] !== RawHtmlBlock::type()) {
+                continue;
+            }
+
+            $print = RawHtmlBlock::protectedFingerprint($block['data']);
+            if (($existing[$print] ?? 0) > 0) {
+                $existing[$print]--; // an unchanged block, possibly moved
+            } else {
+                $changed[] = substr($print, 0, 16);
+            }
+        }
+
+        return $changed;
     }
 }

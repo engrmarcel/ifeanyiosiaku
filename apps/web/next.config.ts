@@ -39,7 +39,7 @@ const securityHeaders = [
       "img-src 'self' data: blob:",
       "font-src 'self'",
       "connect-src 'self'",
-      "frame-src https://challenges.cloudflare.com https://www.google.com https://www.youtube-nocookie.com https://player.vimeo.com",
+      "frame-src 'self' https://challenges.cloudflare.com https://www.google.com https://www.youtube-nocookie.com https://player.vimeo.com",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -72,7 +72,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/:path*", headers: securityHeaders },
+      // Every response except custom-code embeds, which Laravel serves with their own sandbox policy (ADR-031).
+      { source: "/:path((?!api/v1/embeds/).*)", headers: securityHeaders },
       {
         // Private areas must never be cached by shared caches or indexed.
         source: "/account/:path*",

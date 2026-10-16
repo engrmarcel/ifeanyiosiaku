@@ -7,12 +7,15 @@ use App\Domain\Cms\Blocks\Types\CalloutBlock;
 use App\Domain\Cms\Blocks\Types\CallToActionBlock;
 use App\Domain\Cms\Blocks\Types\CardsBlock;
 use App\Domain\Cms\Blocks\Types\CodeBlock;
+use App\Domain\Cms\Blocks\Types\DiagramBlock;
 use App\Domain\Cms\Blocks\Types\DividerBlock;
+use App\Domain\Cms\Blocks\Types\DownloadsBlock;
 use App\Domain\Cms\Blocks\Types\GalleryBlock;
 use App\Domain\Cms\Blocks\Types\HeadingBlock;
 use App\Domain\Cms\Blocks\Types\HeroBlock;
 use App\Domain\Cms\Blocks\Types\ImageBlock;
 use App\Domain\Cms\Blocks\Types\QuoteBlock;
+use App\Domain\Cms\Blocks\Types\RawHtmlBlock;
 use App\Domain\Cms\Blocks\Types\RichTextBlock;
 use App\Domain\Cms\Blocks\Types\StatsBlock;
 use App\Domain\Cms\Blocks\Types\TableBlock;
@@ -46,6 +49,7 @@ class BlockRegistry
             CardsBlock::class, TwoColumnBlock::class, StatsBlock::class, TimelineBlock::class, AccordionBlock::class,
             TabsBlock::class, CodeBlock::class, TerminalBlock::class, CalloutBlock::class, QuoteBlock::class,
             VideoBlock::class, TableBlock::class, CallToActionBlock::class, DividerBlock::class,
+            DownloadsBlock::class, DiagramBlock::class, RawHtmlBlock::class,
         ] as $block) {
             $this->register($block);
         }
@@ -157,12 +161,13 @@ class BlockRegistry
      * Public representation for the website: hidden and unknown blocks are dropped.
      *
      * @param  array<int|string, mixed>|null  $blocks
+     * @param  array{page: string, draft: bool}|null  $embedScope  the page these blocks belong to (enables sandboxed embeds)
      * @return list<array{id: string, type: string, version: int, anchor: string|null, props: array<string, mixed>}>
      */
-    public function toPublic(?array $blocks): array
+    public function toPublic(?array $blocks, ?array $embedScope = null): array
     {
         $blocks = array_values($blocks ?? []);
-        $context = new BlockContext($this->sanitizer, $this->mediaIds($blocks));
+        $context = new BlockContext($this->sanitizer, $this->mediaIds($blocks), $embedScope);
         $public = [];
 
         foreach ($blocks as $index => $block) {
@@ -180,6 +185,7 @@ class BlockRegistry
                 continue;
             }
 
+            $context->index = $index;
             $public[] = [
                 'id' => "block-{$index}",
                 'type' => $type,

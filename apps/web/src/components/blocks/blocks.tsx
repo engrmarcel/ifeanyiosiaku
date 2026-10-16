@@ -40,7 +40,12 @@ export function HeroBlock({ props, anchor, first }: Base & { props: BlockProps<"
 
   return (
     <section id={anchor ?? undefined} className="relative isolate overflow-hidden">
-      <div aria-hidden="true" className="io-grid-backdrop pointer-events-none absolute inset-0 -z-10" />
+      <div aria-hidden="true" className="io-grid-backdrop io-grid-backdrop--drift pointer-events-none absolute inset-0 -z-10" />
+      <div aria-hidden="true" className="io-code-particles -z-10">
+        {["</>", "{ }", "01", "=>", "SUM()", "[ ]"].map((glyph) => (
+          <span key={glyph}>{glyph}</span>
+        ))}
+      </div>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute top-[-20%] left-1/2 -z-10 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(124_92_252/0.22),transparent)] blur-2xl"

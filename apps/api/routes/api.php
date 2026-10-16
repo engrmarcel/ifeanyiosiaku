@@ -2,6 +2,7 @@
 
 use App\Domain\Announcements\Http\AnnouncementController;
 use App\Domain\Captcha\Http\CaptchaController;
+use App\Domain\Cms\Http\EmbedController;
 use App\Domain\Cms\Http\PageController;
 use App\Domain\Cms\Http\SitemapController;
 use App\Domain\Contact\Http\ContactController;
@@ -28,6 +29,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('health', HealthController::class)->name('health');
     Route::get('settings/public', PublicSettingsController::class)->name('settings.public');
     Route::get('site', SiteConfigController::class)->name('site');
+    Route::get('session', [CurrentUserController::class, 'state'])->name('session');
     Route::get('sitemap', SitemapController::class)->name('sitemap');
 
     Route::get('page-resolve', [PageController::class, 'resolve'])->name('pages.resolve');
@@ -43,6 +45,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('preview/page', [PageController::class, 'preview'])
         ->middleware('throttle:30,1')
         ->name('preview.page');
+    Route::get('embeds/{token}', [EmbedController::class, 'show'])
+        ->where('token', '[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+')
+        ->middleware('throttle:120,1')
+        ->name('embeds.show');
     Route::get('preview/article', [ArticleController::class, 'preview'])
         ->middleware('throttle:30,1')
         ->name('preview.article');

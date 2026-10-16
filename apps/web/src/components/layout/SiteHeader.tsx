@@ -6,7 +6,8 @@ import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { cn } from "@/lib/cn";
-import { isExternal, type NavLink } from "@/lib/site/shared";
+import { isExternal } from "@/lib/site/links";
+import type { NavLink } from "@/lib/site/shared";
 
 type SiteHeaderProps = {
   name: string;

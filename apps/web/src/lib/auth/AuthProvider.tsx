@@ -13,9 +13,10 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+/** Asks who is signed in; visitors get a normal "nobody" answer rather than an error. */
 async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
-    return (await api<DataEnvelope<CurrentUser>>("/api/v1/me")).data;
+    return (await api<DataEnvelope<CurrentUser | null>>("/api/v1/session")).data;
   } catch (error) {
     if (!(error instanceof ApiError) || error.status !== 401) {
       console.error("Could not load the current user", error);

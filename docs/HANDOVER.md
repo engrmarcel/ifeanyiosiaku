@@ -14,7 +14,7 @@ Keep this file current so any session can continue without repeating work.
 ## Next actions
 
 1. CI is green on GitHub; the repository is public. Check https://github.com/engrmarcel/ifeanyiosiaku/actions after each push (run list and annotations are readable without login via the GitHub API).
-2. Milestone 2 in progress: steps 1–7 done (media library; pages/blocks/publishing; website rendering; portfolio + homepage; navigation/footer/appearance, redirects, sitemap/robots/JSON-LD; articles, publications, PDF uploads, share bar; announcement popup, contact form, newsletter). Next: step 8 (raw HTML block, download and diagram blocks, Lighthouse/axe measurement, Journey F acceptance).
+2. **Milestone 2 complete** (2026-10-16): steps 1–8 done (media library; pages/blocks/publishing; website rendering; portfolio + homepage; navigation/footer/appearance, redirects, sitemap/robots/JSON-LD; articles, publications, PDF uploads, share bar; announcement popup, contact form, newsletter; custom-code, downloads and diagram blocks; hero motion; Journey F; measured quality — docs/QUALITY_REPORT.md). Next: Milestone 3 (Commerce), gated by the commerce add-on (ADR-025).
 
 ## Environment notes (this machine)
 

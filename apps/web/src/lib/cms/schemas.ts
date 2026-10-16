@@ -143,6 +143,11 @@ export const blockSchemas = {
   }),
   articles: sectionHeader.extend({ items: z.array(articleCardSchema), allUrl: z.string().nullable() }),
   contact_form: sectionHeader.extend({ buttonLabel: z.string() }),
+  raw_html: z.object({ title: z.string(), src: z.string().startsWith("/api/v1/embeds/").nullable(), height: z.number().int().nullable() }),
+  downloads: sectionHeader.extend({
+    files: z.array(z.object({ name: z.string(), description: z.string().nullable(), url: z.string(), size: z.number() })),
+  }),
+  diagram: z.object({ source: z.string(), description: z.string(), caption: z.string().nullable(), showSource: z.boolean() }),
   newsletter_signup: sectionHeader.extend({ buttonLabel: z.string(), enabled: z.boolean(), consentText: z.string() }),
   testimonials: sectionHeader.extend({
     items: z.array(z.object({ quote: z.string(), author: z.string(), title: z.string().nullable(), avatar: mediaSchema.nullable() })),

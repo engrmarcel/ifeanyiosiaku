@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
-import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { AnnouncementPopup } from "@/components/engagement/AnnouncementPopup";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -9,6 +8,7 @@ import { ContentProtection } from "@/components/protection/ContentProtection";
 import { ToastProvider } from "@/components/ui/Toast";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsProvider";
+import { GeistMonoLazy } from "@/lib/fonts";
 import { getSiteConfig } from "@/lib/site/config";
 import { SITE_URL } from "@/lib/site/url";
 import "./globals.css";
@@ -51,7 +51,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   } as CSSProperties;
 
   return (
-    <html lang="en" style={theme} className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}>
+    <html lang="en" style={theme} className={`${GeistSans.variable} ${GeistMonoLazy.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#main"

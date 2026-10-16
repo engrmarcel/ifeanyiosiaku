@@ -7,6 +7,7 @@ use App\Domain\Identity\Enums\Role;
 use App\Domain\Portfolio\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /*
@@ -59,4 +60,10 @@ function sitemapPaths(): array
 {
     return collect(test()->withHeaders(test()->apiHeaders())->getJson('/api/v1/sitemap')->assertOk()->json('data.entries'))
         ->pluck('path')->all();
+}
+
+/** Builder state is keyed by item UUID inside Livewire. */
+function builderState(array $blocks): array
+{
+    return collect($blocks)->mapWithKeys(fn (array $b) => [(string) Str::uuid() => $b])->all();
 }

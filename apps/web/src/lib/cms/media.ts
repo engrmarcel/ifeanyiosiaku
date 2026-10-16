@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Every schema module imports this file, so this runs before any data is checked. Zod otherwise probes
+// whether eval() is allowed, which trips the site's Content-Security-Policy; the speed-up is not needed here.
+z.config({ jitless: true });
+
 /** A media library image as the API sends it (shared by CMS blocks, articles and site settings). */
 export const mediaSchema = z.object({
   id: z.string(),
