@@ -76,14 +76,26 @@ export async function getProduct(slug: string, currency?: string): Promise<Produ
 /**
  * Whether the store add-on is switched on, for pages that have no product data of their own (cart,
  * checkout, orders). Cached with the shared layout, which Laravel refreshes when add-ons change.
+ * If the API cannot be reached (for example during a build), the pages render and check again
+ * within minutes; the API itself still refuses every store request while the add-on is off.
  */
 export async function storeIsOpen(): Promise<boolean> {
   "use cache";
   cacheTag(SITE_TAG);
-  cacheLife("hours");
 
-  const { status, body } = await serverGet<{ data?: Record<string, unknown> }>("/api/v1/settings/public");
-  return status !== 200 || body?.data?.["addons.commerce.enabled"] !== false;
+  try {
+    const { status, body } = await serverGet<{ data?: Record<string, unknown> }>("/api/v1/settings/public");
+    if (status === 200) {
+      cacheLife("hours");
+      return body?.data?.["addons.commerce.enabled"] !== false;
+    }
+    console.error("[store] Unexpected settings response; assuming the store is open.", status);
+  } catch (error) {
+    console.error("[store] Settings could not be loaded; assuming the store is open.", error);
+  }
+
+  cacheLife("minutes");
+  return true;
 }
 
 export function storeHref(filters: StoreFilters): string {
